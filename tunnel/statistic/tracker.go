@@ -65,13 +65,15 @@ func (tt *tcpTracker) Write(b []byte) (int, error) {
 }
 
 func (tt *tcpTracker) Close() error {
-	go func() {
-		// 增加延迟时间，在3秒后关闭，在web端能观察到异常关闭情况。
-		if time.Now().Sub(tt.Start) < time.Duration(3)*time.Second {
-			time.Sleep(time.Duration(3) * time.Second)
-		}
-		tt.manager.Leave(tt)
-	}()
+	//go func() {
+	//	// 增加延迟时间，在3秒后关闭，在web端能观察到异常关闭情况。
+	//	if time.Now().Sub(tt.Start) < time.Duration(3)*time.Second {
+	//		time.Sleep(time.Duration(3) * time.Second)
+	//	}
+	//	tt.manager.Leave(tt)
+	//}()
+
+	tt.manager.Leave(tt)
 
 	if tt.Conn == nil {
 		return nil

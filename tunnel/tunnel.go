@@ -309,10 +309,11 @@ func handleUDPConn(packet *inbound.PacketAdapter) {
 func handleTCPConn(ctx C.ConnContext) {
 	defer ctx.Conn().Close()
 	tcpTrack := statistic.Conn2TCPTracker(ctx.Tracker())
-	defer tcpTrack.Close()
+
 	if tcpTrack == nil {
 		tcpTrack = statistic.NewTCPTracker(nil, statistic.DefaultManager, ctx.Metadata(), nil, nil)
 	}
+	defer tcpTrack.Close()
 	tcpTrack.Chain = []string{"DISP", "ERROR"}
 
 	metadata := ctx.Metadata()
@@ -354,8 +355,11 @@ func handleTCPConn(ctx C.ConnContext) {
 			log.Warnln("[TCP] dial %s (match %s/%s) to %s error: %s", proxy.Name(), rule.RuleType().String(), rule.Payload(), metadata.RemoteAddress(), err.Error())
 		}
 		tcpTrack.Chain = []string{err.Error(), "ERROR", proxy.Name()}
+		if time.Now().Sub(tcpTrack.Start) < time.Duration(3)*time.Second {
+			time.Sleep(time.Duration(3) * time.Second)
+		}
 		//time.Sleep(time.Duration(3) * time.Second)
-		defer tcpTrack.Close()
+		//defer tcpTrack.Close()
 		return
 	}
 	tcpTrack.Chain = []string{"RECO", "ERROR"}
