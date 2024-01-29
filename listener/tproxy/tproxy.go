@@ -3,9 +3,9 @@ package tproxy
 import (
 	"net"
 
-	"github.com/finddiff/clashWithCache/adapter/inbound"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/transport/socks5"
+	"github.com/finddiff/RuleBaseProxy/adapter/inbound"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/transport/socks5"
 )
 
 type Listener struct {

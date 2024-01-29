@@ -6,7 +6,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/finddiff/clashWithCache/component/resolver"
+	"github.com/finddiff/RuleBaseProxy/component/resolver"
 )
 
 func DialContext(ctx context.Context, network, address string, options ...Option) (net.Conn, error) {

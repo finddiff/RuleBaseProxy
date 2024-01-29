@@ -7,10 +7,10 @@ import (
 	"net"
 	"strconv"
 
-	"github.com/finddiff/clashWithCache/component/dialer"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/transport/gun"
-	"github.com/finddiff/clashWithCache/transport/trojan"
+	"github.com/finddiff/RuleBaseProxy/component/dialer"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/transport/gun"
+	"github.com/finddiff/RuleBaseProxy/transport/trojan"
 
 	"golang.org/x/net/http2"
 )

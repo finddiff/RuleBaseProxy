@@ -1,9 +1,9 @@
 package hub
 
 import (
-	"github.com/finddiff/clashWithCache/config"
-	"github.com/finddiff/clashWithCache/hub/executor"
-	"github.com/finddiff/clashWithCache/hub/route"
+	"github.com/finddiff/RuleBaseProxy/config"
+	"github.com/finddiff/RuleBaseProxy/hub/executor"
+	"github.com/finddiff/RuleBaseProxy/hub/route"
 )
 
 type Option func(*config.Config)

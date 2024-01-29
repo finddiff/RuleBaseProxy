@@ -3,9 +3,9 @@ package inbound
 import (
 	"net"
 
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/context"
-	"github.com/finddiff/clashWithCache/transport/socks5"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/context"
+	"github.com/finddiff/RuleBaseProxy/transport/socks5"
 )
 
 // NewHTTP receive normal http request and return HTTPContext

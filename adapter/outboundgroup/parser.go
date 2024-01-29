@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/finddiff/clashWithCache/adapter/provider"
-	"github.com/finddiff/clashWithCache/common/structure"
-	C "github.com/finddiff/clashWithCache/constant"
-	types "github.com/finddiff/clashWithCache/constant/provider"
+	"github.com/finddiff/RuleBaseProxy/adapter/provider"
+	"github.com/finddiff/RuleBaseProxy/common/structure"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	types "github.com/finddiff/RuleBaseProxy/constant/provider"
 )
 
 var (

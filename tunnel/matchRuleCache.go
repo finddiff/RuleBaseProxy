@@ -6,9 +6,9 @@ import (
 
 	//HS "github.com/cornelk/hashmap"
 	"github.com/dgraph-io/ristretto"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/log"
-	"github.com/finddiff/clashWithCache/tunnel/statistic"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/log"
+	"github.com/finddiff/RuleBaseProxy/tunnel/statistic"
 	//"golang.org/x/sync/syncmap"
 	"net"
 )

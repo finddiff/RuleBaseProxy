@@ -6,10 +6,10 @@ import (
 	"net"
 	"strconv"
 
-	"github.com/finddiff/clashWithCache/component/dialer"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/transport/ssr/obfs"
-	"github.com/finddiff/clashWithCache/transport/ssr/protocol"
+	"github.com/finddiff/RuleBaseProxy/component/dialer"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/transport/ssr/obfs"
+	"github.com/finddiff/RuleBaseProxy/transport/ssr/protocol"
 
 	"github.com/Dreamacro/go-shadowsocks2/core"
 	"github.com/Dreamacro/go-shadowsocks2/shadowaead"

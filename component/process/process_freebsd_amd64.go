@@ -11,7 +11,7 @@ import (
 	"syscall"
 	"unsafe"
 
-	"github.com/finddiff/clashWithCache/log"
+	"github.com/finddiff/RuleBaseProxy/log"
 )
 
 // store process name for when dealing with multiple PROCESS-NAME rules

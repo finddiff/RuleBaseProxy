@@ -5,12 +5,12 @@ import (
 	"io/ioutil"
 	"net"
 
-	"github.com/finddiff/clashWithCache/adapter/inbound"
-	N "github.com/finddiff/clashWithCache/common/net"
-	C "github.com/finddiff/clashWithCache/constant"
-	authStore "github.com/finddiff/clashWithCache/listener/auth"
-	"github.com/finddiff/clashWithCache/transport/socks4"
-	"github.com/finddiff/clashWithCache/transport/socks5"
+	"github.com/finddiff/RuleBaseProxy/adapter/inbound"
+	N "github.com/finddiff/RuleBaseProxy/common/net"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	authStore "github.com/finddiff/RuleBaseProxy/listener/auth"
+	"github.com/finddiff/RuleBaseProxy/transport/socks4"
+	"github.com/finddiff/RuleBaseProxy/transport/socks5"
 )
 
 type Listener struct {

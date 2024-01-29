@@ -4,8 +4,8 @@ import (
 	"net"
 	"strings"
 
-	"github.com/finddiff/clashWithCache/component/mmdb"
-	"github.com/finddiff/clashWithCache/component/trie"
+	"github.com/finddiff/RuleBaseProxy/component/mmdb"
+	"github.com/finddiff/RuleBaseProxy/component/trie"
 )
 
 type fallbackIPFilter interface {

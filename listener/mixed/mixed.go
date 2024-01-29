@@ -4,13 +4,13 @@ import (
 	"net"
 	"time"
 
-	"github.com/finddiff/clashWithCache/common/cache"
-	N "github.com/finddiff/clashWithCache/common/net"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/listener/http"
-	"github.com/finddiff/clashWithCache/listener/socks"
-	"github.com/finddiff/clashWithCache/transport/socks4"
-	"github.com/finddiff/clashWithCache/transport/socks5"
+	"github.com/finddiff/RuleBaseProxy/common/cache"
+	N "github.com/finddiff/RuleBaseProxy/common/net"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/listener/http"
+	"github.com/finddiff/RuleBaseProxy/listener/socks"
+	"github.com/finddiff/RuleBaseProxy/transport/socks4"
+	"github.com/finddiff/RuleBaseProxy/transport/socks5"
 )
 
 type Listener struct {

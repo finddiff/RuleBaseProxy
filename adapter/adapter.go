@@ -9,8 +9,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/finddiff/clashWithCache/common/queue"
-	C "github.com/finddiff/clashWithCache/constant"
+	"github.com/finddiff/RuleBaseProxy/common/queue"
+	C "github.com/finddiff/RuleBaseProxy/constant"
 
 	"go.uber.org/atomic"
 )

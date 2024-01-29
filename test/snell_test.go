@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/finddiff/clashWithCache/adapter/outbound"
-	C "github.com/finddiff/clashWithCache/constant"
+	"github.com/finddiff/RuleBaseProxy/adapter/outbound"
+	C "github.com/finddiff/RuleBaseProxy/constant"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/stretchr/testify/assert"

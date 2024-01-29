@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"net"
 
-	"github.com/finddiff/clashWithCache/common/pool"
+	"github.com/finddiff/RuleBaseProxy/common/pool"
 )
 
 func init() {

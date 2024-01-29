@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"net"
 
-	"github.com/finddiff/clashWithCache/common/pool"
+	"github.com/finddiff/RuleBaseProxy/common/pool"
 )
 
 type Conn struct {

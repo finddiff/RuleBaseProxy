@@ -7,9 +7,9 @@ import (
 	"os"
 	"sync"
 
-	"github.com/finddiff/clashWithCache/component/profile"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/log"
+	"github.com/finddiff/RuleBaseProxy/component/profile"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/log"
 )
 
 var (

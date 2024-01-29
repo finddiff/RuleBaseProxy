@@ -10,7 +10,7 @@ RUN go mod download && \
     mv ./bin/clash-docker /clash
 
 FROM alpine:latest
-LABEL org.opencontainers.image.source="https://github.com/finddiff/clashWithCache"
+LABEL org.opencontainers.image.source="https://github.com/finddiff/RuleBaseProxy"
 
 RUN apk add --no-cache ca-certificates
 COPY --from=builder /Country.mmdb /root/.config/clash/

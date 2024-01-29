@@ -6,7 +6,7 @@ import (
 	"syscall"
 	"unsafe"
 
-	"github.com/finddiff/clashWithCache/transport/socks5"
+	"github.com/finddiff/RuleBaseProxy/transport/socks5"
 )
 
 const (

@@ -5,7 +5,7 @@ import (
 	"net"
 	"time"
 
-	C "github.com/finddiff/clashWithCache/constant"
+	C "github.com/finddiff/RuleBaseProxy/constant"
 )
 
 func addrToMetadata(rawAddress string) (addr *C.Metadata, err error) {

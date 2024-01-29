@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/finddiff/clashWithCache/common/batch"
-	C "github.com/finddiff/clashWithCache/constant"
+	"github.com/finddiff/RuleBaseProxy/common/batch"
+	C "github.com/finddiff/RuleBaseProxy/constant"
 
 	"go.uber.org/atomic"
 )

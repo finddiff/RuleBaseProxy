@@ -7,9 +7,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/finddiff/clashWithCache/component/dhcp"
-	"github.com/finddiff/clashWithCache/component/iface"
-	"github.com/finddiff/clashWithCache/component/resolver"
+	"github.com/finddiff/RuleBaseProxy/component/dhcp"
+	"github.com/finddiff/RuleBaseProxy/component/iface"
+	"github.com/finddiff/RuleBaseProxy/component/resolver"
 
 	D "github.com/miekg/dns"
 )

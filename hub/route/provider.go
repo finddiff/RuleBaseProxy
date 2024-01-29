@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/finddiff/clashWithCache/constant/provider"
-	"github.com/finddiff/clashWithCache/tunnel"
+	"github.com/finddiff/RuleBaseProxy/constant/provider"
+	"github.com/finddiff/RuleBaseProxy/tunnel"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"

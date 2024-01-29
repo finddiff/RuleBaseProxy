@@ -6,11 +6,11 @@ import (
 	"net"
 	"strconv"
 
-	"github.com/finddiff/clashWithCache/common/structure"
-	"github.com/finddiff/clashWithCache/component/dialer"
-	C "github.com/finddiff/clashWithCache/constant"
-	obfs "github.com/finddiff/clashWithCache/transport/simple-obfs"
-	"github.com/finddiff/clashWithCache/transport/snell"
+	"github.com/finddiff/RuleBaseProxy/common/structure"
+	"github.com/finddiff/RuleBaseProxy/component/dialer"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	obfs "github.com/finddiff/RuleBaseProxy/transport/simple-obfs"
+	"github.com/finddiff/RuleBaseProxy/transport/snell"
 )
 
 type Snell struct {

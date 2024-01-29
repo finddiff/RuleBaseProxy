@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/finddiff/clashWithCache/Persistence"
+	"github.com/finddiff/RuleBaseProxy/Persistence"
 	"go.uber.org/automaxprocs/maxprocs"
 	"os"
 	"os/signal"
@@ -11,11 +11,11 @@ import (
 	"runtime"
 	"syscall"
 
-	"github.com/finddiff/clashWithCache/config"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/hub"
-	"github.com/finddiff/clashWithCache/hub/executor"
-	"github.com/finddiff/clashWithCache/log"
+	"github.com/finddiff/RuleBaseProxy/config"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/hub"
+	"github.com/finddiff/RuleBaseProxy/hub/executor"
+	"github.com/finddiff/RuleBaseProxy/log"
 )
 
 var (

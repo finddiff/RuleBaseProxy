@@ -5,7 +5,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/finddiff/clashWithCache/component/pool"
+	"github.com/finddiff/RuleBaseProxy/component/pool"
 
 	"github.com/Dreamacro/go-shadowsocks2/shadowaead"
 )

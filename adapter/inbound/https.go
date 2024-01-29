@@ -4,8 +4,8 @@ import (
 	"net"
 	"net/http"
 
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/context"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/context"
 )
 
 // NewHTTPS receive CONNECT request and return ConnContext

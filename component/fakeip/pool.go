@@ -5,8 +5,8 @@ import (
 	"net"
 	"sync"
 
-	"github.com/finddiff/clashWithCache/common/cache"
-	"github.com/finddiff/clashWithCache/component/trie"
+	"github.com/finddiff/RuleBaseProxy/common/cache"
+	"github.com/finddiff/RuleBaseProxy/component/trie"
 )
 
 // Pool is a implementation about fake ip generator without storage

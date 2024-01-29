@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"time"
 
-	types "github.com/finddiff/clashWithCache/constant/provider"
-	"github.com/finddiff/clashWithCache/log"
+	types "github.com/finddiff/RuleBaseProxy/constant/provider"
+	"github.com/finddiff/RuleBaseProxy/log"
 )
 
 var (

@@ -3,9 +3,9 @@ package adapter
 import (
 	"fmt"
 
-	"github.com/finddiff/clashWithCache/adapter/outbound"
-	"github.com/finddiff/clashWithCache/common/structure"
-	C "github.com/finddiff/clashWithCache/constant"
+	"github.com/finddiff/RuleBaseProxy/adapter/outbound"
+	"github.com/finddiff/RuleBaseProxy/common/structure"
+	C "github.com/finddiff/RuleBaseProxy/constant"
 )
 
 func ParseProxy(mapping map[string]interface{}) (C.Proxy, error) {

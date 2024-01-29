@@ -1,7 +1,7 @@
 package provider
 
 import (
-	"github.com/finddiff/clashWithCache/constant"
+	"github.com/finddiff/RuleBaseProxy/constant"
 )
 
 // Vehicle Type

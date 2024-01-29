@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/finddiff/clashWithCache/adapter/outboundgroup"
-	"github.com/finddiff/clashWithCache/common/structure"
+	"github.com/finddiff/RuleBaseProxy/adapter/outboundgroup"
+	"github.com/finddiff/RuleBaseProxy/common/structure"
 )
 
 func trimArr(arr []string) (r []string) {

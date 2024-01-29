@@ -4,8 +4,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/finddiff/clashWithCache/common/cache"
-	C "github.com/finddiff/clashWithCache/constant"
+	"github.com/finddiff/RuleBaseProxy/common/cache"
+	C "github.com/finddiff/RuleBaseProxy/constant"
 )
 
 type Listener struct {

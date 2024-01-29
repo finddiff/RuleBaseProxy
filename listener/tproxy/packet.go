@@ -3,7 +3,7 @@ package tproxy
 import (
 	"net"
 
-	"github.com/finddiff/clashWithCache/common/pool"
+	"github.com/finddiff/RuleBaseProxy/common/pool"
 )
 
 type packet struct {

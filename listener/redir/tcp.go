@@ -3,8 +3,8 @@ package redir
 import (
 	"net"
 
-	"github.com/finddiff/clashWithCache/adapter/inbound"
-	C "github.com/finddiff/clashWithCache/constant"
+	"github.com/finddiff/RuleBaseProxy/adapter/inbound"
+	C "github.com/finddiff/RuleBaseProxy/constant"
 )
 
 type Listener struct {

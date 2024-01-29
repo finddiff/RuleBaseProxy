@@ -1,12 +1,12 @@
 package forward
 
 import (
-	"github.com/finddiff/clashWithCache/adapter/inbound"
-	"github.com/finddiff/clashWithCache/common/pool"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/context"
-	log "github.com/finddiff/clashWithCache/log"
-	"github.com/finddiff/clashWithCache/tunnel"
+	"github.com/finddiff/RuleBaseProxy/adapter/inbound"
+	"github.com/finddiff/RuleBaseProxy/common/pool"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/context"
+	log "github.com/finddiff/RuleBaseProxy/log"
+	"github.com/finddiff/RuleBaseProxy/tunnel"
 	"github.com/xjasonlyu/tun2socks/v2/core/adapter"
 	tunTunnel "github.com/xjasonlyu/tun2socks/v2/tunnel"
 	"net"

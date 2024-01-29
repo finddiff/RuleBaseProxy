@@ -3,13 +3,13 @@ package dns
 import (
 	"bytes"
 	"encoding/gob"
-	"github.com/finddiff/clashWithCache/Persistence"
-	"github.com/finddiff/clashWithCache/common/cache"
-	"github.com/finddiff/clashWithCache/log"
-	"github.com/finddiff/clashWithCache/tunnel"
+	"github.com/finddiff/RuleBaseProxy/Persistence"
+	"github.com/finddiff/RuleBaseProxy/common/cache"
+	"github.com/finddiff/RuleBaseProxy/log"
+	"github.com/finddiff/RuleBaseProxy/tunnel"
 	"net"
 
-	C "github.com/finddiff/clashWithCache/constant"
+	C "github.com/finddiff/RuleBaseProxy/constant"
 	D "github.com/miekg/dns"
 	//"github.com/xujiajun/nutsdb"
 	nutsdb "github.com/finddiff/nutsDBMD"

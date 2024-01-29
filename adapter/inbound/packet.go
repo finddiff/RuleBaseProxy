@@ -1,8 +1,8 @@
 package inbound
 
 import (
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/transport/socks5"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/transport/socks5"
 )
 
 // PacketAdapter is a UDP Packet adapter for socks/redir/tun

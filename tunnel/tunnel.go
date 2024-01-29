@@ -7,14 +7,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/finddiff/clashWithCache/adapter/inbound"
-	"github.com/finddiff/clashWithCache/component/nat"
-	"github.com/finddiff/clashWithCache/component/resolver"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/constant/provider"
-	"github.com/finddiff/clashWithCache/context"
-	"github.com/finddiff/clashWithCache/log"
-	"github.com/finddiff/clashWithCache/tunnel/statistic"
+	"github.com/finddiff/RuleBaseProxy/adapter/inbound"
+	"github.com/finddiff/RuleBaseProxy/component/nat"
+	"github.com/finddiff/RuleBaseProxy/component/resolver"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/constant/provider"
+	"github.com/finddiff/RuleBaseProxy/context"
+	"github.com/finddiff/RuleBaseProxy/log"
+	"github.com/finddiff/RuleBaseProxy/tunnel/statistic"
 )
 
 var (

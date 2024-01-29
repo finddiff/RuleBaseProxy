@@ -3,7 +3,7 @@ package rules
 import (
 	"strings"
 
-	C "github.com/finddiff/clashWithCache/constant"
+	C "github.com/finddiff/RuleBaseProxy/constant"
 )
 
 type Domain struct {

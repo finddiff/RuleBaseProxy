@@ -7,12 +7,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/finddiff/clashWithCache/adapter/inbound"
-	"github.com/finddiff/clashWithCache/common/cache"
-	N "github.com/finddiff/clashWithCache/common/net"
-	C "github.com/finddiff/clashWithCache/constant"
-	authStore "github.com/finddiff/clashWithCache/listener/auth"
-	"github.com/finddiff/clashWithCache/log"
+	"github.com/finddiff/RuleBaseProxy/adapter/inbound"
+	"github.com/finddiff/RuleBaseProxy/common/cache"
+	N "github.com/finddiff/RuleBaseProxy/common/net"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	authStore "github.com/finddiff/RuleBaseProxy/listener/auth"
+	"github.com/finddiff/RuleBaseProxy/log"
 )
 
 func HandleConn(c net.Conn, in chan<- C.ConnContext, cache *cache.Cache) {

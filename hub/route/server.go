@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/log"
-	"github.com/finddiff/clashWithCache/tunnel/statistic"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/log"
+	"github.com/finddiff/RuleBaseProxy/tunnel/statistic"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"

@@ -3,16 +3,16 @@ package dns
 import (
 	"bytes"
 	"context"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/log"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/log"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
 	"strings"
 
-	"github.com/finddiff/clashWithCache/component/dialer"
-	"github.com/finddiff/clashWithCache/component/resolver"
+	"github.com/finddiff/RuleBaseProxy/component/dialer"
+	"github.com/finddiff/RuleBaseProxy/component/resolver"
 
 	D "github.com/miekg/dns"
 )

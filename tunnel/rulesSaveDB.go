@@ -1,10 +1,10 @@
 package tunnel
 
 import (
-	"github.com/finddiff/clashWithCache/Persistence"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/log"
-	R "github.com/finddiff/clashWithCache/rule"
+	"github.com/finddiff/RuleBaseProxy/Persistence"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/log"
+	R "github.com/finddiff/RuleBaseProxy/rule"
 	//"github.com/xujiajun/nutsdb"
 	nutsdb "github.com/finddiff/nutsDBMD"
 	"strings"

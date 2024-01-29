@@ -4,11 +4,11 @@ import (
 	"crypto/cipher"
 	"encoding/binary"
 	"errors"
-	"github.com/finddiff/clashWithCache/log"
+	"github.com/finddiff/RuleBaseProxy/log"
 	"io"
 	"sync"
 
-	"github.com/finddiff/clashWithCache/common/pool"
+	"github.com/finddiff/RuleBaseProxy/common/pool"
 )
 
 type aeadWriter struct {

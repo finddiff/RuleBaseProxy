@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/finddiff/clashWithCache/adapter/inbound"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/transport/socks5"
+	"github.com/finddiff/RuleBaseProxy/adapter/inbound"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/transport/socks5"
 )
 
 func newClient(source net.Addr, in chan<- C.ConnContext) *http.Client {

@@ -3,8 +3,8 @@ package dns
 import (
 	"net"
 
-	"github.com/finddiff/clashWithCache/common/cache"
-	"github.com/finddiff/clashWithCache/component/fakeip"
+	"github.com/finddiff/RuleBaseProxy/common/cache"
+	"github.com/finddiff/RuleBaseProxy/component/fakeip"
 )
 
 type ResolverEnhancer struct {

@@ -7,11 +7,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/finddiff/clashWithCache/adapter"
-	"github.com/finddiff/clashWithCache/adapter/outboundgroup"
-	"github.com/finddiff/clashWithCache/component/profile/cachefile"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/tunnel"
+	"github.com/finddiff/RuleBaseProxy/adapter"
+	"github.com/finddiff/RuleBaseProxy/adapter/outboundgroup"
+	"github.com/finddiff/RuleBaseProxy/component/profile/cachefile"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/tunnel"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"

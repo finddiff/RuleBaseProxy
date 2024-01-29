@@ -1,12 +1,12 @@
 package inbound
 
 import (
-	"github.com/finddiff/clashWithCache/log"
+	"github.com/finddiff/RuleBaseProxy/log"
 	"net"
 
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/context"
-	"github.com/finddiff/clashWithCache/transport/socks5"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/context"
+	"github.com/finddiff/RuleBaseProxy/transport/socks5"
 )
 
 // NewSocket receive TCP inbound and return ConnContext

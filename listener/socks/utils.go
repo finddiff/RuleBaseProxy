@@ -3,8 +3,8 @@ package socks
 import (
 	"net"
 
-	"github.com/finddiff/clashWithCache/common/pool"
-	"github.com/finddiff/clashWithCache/transport/socks5"
+	"github.com/finddiff/RuleBaseProxy/common/pool"
+	"github.com/finddiff/RuleBaseProxy/transport/socks5"
 )
 
 type packet struct {

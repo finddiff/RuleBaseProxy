@@ -6,12 +6,12 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"errors"
-	"github.com/finddiff/clashWithCache/common/pool"
+	"github.com/finddiff/RuleBaseProxy/common/pool"
 	"io"
 	"net"
 	"sync"
 
-	"github.com/finddiff/clashWithCache/transport/socks5"
+	"github.com/finddiff/RuleBaseProxy/transport/socks5"
 )
 
 const (

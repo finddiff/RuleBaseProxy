@@ -1,10 +1,10 @@
 package context
 
 import (
-	"github.com/finddiff/clashWithCache/tunnel/statistic"
+	"github.com/finddiff/RuleBaseProxy/tunnel/statistic"
 	"net"
 
-	C "github.com/finddiff/clashWithCache/constant"
+	C "github.com/finddiff/RuleBaseProxy/constant"
 
 	"github.com/gofrs/uuid"
 )

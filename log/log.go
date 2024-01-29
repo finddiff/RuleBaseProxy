@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/finddiff/clashWithCache/common/observable"
+	"github.com/finddiff/RuleBaseProxy/common/observable"
 
 	log "github.com/sirupsen/logrus"
 )

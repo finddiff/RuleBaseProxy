@@ -7,8 +7,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/finddiff/clashWithCache/common/cache"
-	"github.com/finddiff/clashWithCache/log"
+	"github.com/finddiff/RuleBaseProxy/common/cache"
+	"github.com/finddiff/RuleBaseProxy/log"
 
 	D "github.com/miekg/dns"
 )

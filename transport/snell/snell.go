@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Dreamacro/go-shadowsocks2/shadowaead"
-	"github.com/finddiff/clashWithCache/common/pool"
+	"github.com/finddiff/RuleBaseProxy/common/pool"
 	"io"
 	"net"
 )

@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/finddiff/clashWithCache/component/mmdb"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/log"
+	"github.com/finddiff/RuleBaseProxy/component/mmdb"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/log"
 )
 
 func downloadMMDB(path string) (err error) {

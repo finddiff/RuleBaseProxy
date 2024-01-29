@@ -8,7 +8,7 @@ import (
 	"net"
 	"strconv"
 
-	"github.com/finddiff/clashWithCache/component/auth"
+	"github.com/finddiff/RuleBaseProxy/component/auth"
 )
 
 const Version = 0x04

@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/finddiff/clashWithCache/component/resolver"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/transport/socks5"
+	"github.com/finddiff/RuleBaseProxy/component/resolver"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/transport/socks5"
 )
 
 func tcpKeepAlive(c net.Conn) {

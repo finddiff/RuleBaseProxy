@@ -8,8 +8,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/finddiff/clashWithCache/component/dialer"
-	types "github.com/finddiff/clashWithCache/constant/provider"
+	"github.com/finddiff/RuleBaseProxy/component/dialer"
+	types "github.com/finddiff/RuleBaseProxy/constant/provider"
 )
 
 type FileVehicle struct {

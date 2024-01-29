@@ -7,9 +7,9 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/finddiff/clashWithCache/adapter"
-	C "github.com/finddiff/clashWithCache/constant"
-	types "github.com/finddiff/clashWithCache/constant/provider"
+	"github.com/finddiff/RuleBaseProxy/adapter"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	types "github.com/finddiff/RuleBaseProxy/constant/provider"
 
 	"gopkg.in/yaml.v2"
 )

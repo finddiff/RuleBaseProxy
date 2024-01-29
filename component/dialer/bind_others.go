@@ -4,12 +4,12 @@
 package dialer
 
 import (
-	"github.com/finddiff/clashWithCache/log"
+	"github.com/finddiff/RuleBaseProxy/log"
 	"net"
 	"strconv"
 	"strings"
 
-	"github.com/finddiff/clashWithCache/component/iface"
+	"github.com/finddiff/RuleBaseProxy/component/iface"
 )
 
 func lookupLocalAddr(ifaceName string, network string, destination net.IP, port int) (net.Addr, error) {

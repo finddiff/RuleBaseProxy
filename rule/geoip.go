@@ -3,8 +3,8 @@ package rules
 import (
 	"strings"
 
-	"github.com/finddiff/clashWithCache/component/mmdb"
-	C "github.com/finddiff/clashWithCache/constant"
+	"github.com/finddiff/RuleBaseProxy/component/mmdb"
+	C "github.com/finddiff/RuleBaseProxy/constant"
 )
 
 type GEOIP struct {

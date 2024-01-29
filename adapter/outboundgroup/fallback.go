@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/finddiff/clashWithCache/adapter/outbound"
-	"github.com/finddiff/clashWithCache/common/singledo"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/constant/provider"
+	"github.com/finddiff/RuleBaseProxy/adapter/outbound"
+	"github.com/finddiff/RuleBaseProxy/common/singledo"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/constant/provider"
 )
 
 type Fallback struct {

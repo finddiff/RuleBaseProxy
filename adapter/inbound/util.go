@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/transport/socks5"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/transport/socks5"
 )
 
 func parseSocksAddr(target socks5.Addr) *C.Metadata {

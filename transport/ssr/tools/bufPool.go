@@ -2,7 +2,7 @@ package tools
 
 import (
 	"bytes"
-	"github.com/finddiff/clashWithCache/common/pool"
+	"github.com/finddiff/RuleBaseProxy/common/pool"
 	"math/rand"
 )
 

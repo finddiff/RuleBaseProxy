@@ -9,11 +9,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/finddiff/clashWithCache/common/cache"
-	"github.com/finddiff/clashWithCache/common/picker"
-	"github.com/finddiff/clashWithCache/component/fakeip"
-	"github.com/finddiff/clashWithCache/component/resolver"
-	"github.com/finddiff/clashWithCache/component/trie"
+	"github.com/finddiff/RuleBaseProxy/common/cache"
+	"github.com/finddiff/RuleBaseProxy/common/picker"
+	"github.com/finddiff/RuleBaseProxy/component/fakeip"
+	"github.com/finddiff/RuleBaseProxy/component/resolver"
+	"github.com/finddiff/RuleBaseProxy/component/trie"
 
 	D "github.com/miekg/dns"
 	"golang.org/x/sync/singleflight"

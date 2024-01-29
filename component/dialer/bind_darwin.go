@@ -6,7 +6,7 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/finddiff/clashWithCache/component/iface"
+	"github.com/finddiff/RuleBaseProxy/component/iface"
 )
 
 type controlFn = func(network, address string, c syscall.RawConn) error

@@ -13,8 +13,8 @@ import (
 	"net/url"
 	"strconv"
 
-	"github.com/finddiff/clashWithCache/component/dialer"
-	C "github.com/finddiff/clashWithCache/constant"
+	"github.com/finddiff/RuleBaseProxy/component/dialer"
+	C "github.com/finddiff/RuleBaseProxy/constant"
 )
 
 type Http struct {

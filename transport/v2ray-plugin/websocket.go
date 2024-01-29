@@ -4,7 +4,7 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/finddiff/clashWithCache/transport/vmess"
+	"github.com/finddiff/RuleBaseProxy/transport/vmess"
 )
 
 // Option is options of websocket obfs

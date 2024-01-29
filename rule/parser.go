@@ -3,7 +3,7 @@ package rules
 import (
 	"fmt"
 
-	C "github.com/finddiff/clashWithCache/constant"
+	C "github.com/finddiff/RuleBaseProxy/constant"
 )
 
 func ParseRule(tp, payload, target string, params []string) (C.Rule, error) {

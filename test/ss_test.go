@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/finddiff/clashWithCache/adapter/outbound"
+	"github.com/finddiff/RuleBaseProxy/adapter/outbound"
 
 	"github.com/docker/docker/api/types/container"
 	"github.com/stretchr/testify/assert"

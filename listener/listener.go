@@ -2,20 +2,20 @@ package proxy
 
 import (
 	"fmt"
-	"github.com/finddiff/clashWithCache/listener/tun"
-	"github.com/finddiff/clashWithCache/listener/tun/forward"
+	"github.com/finddiff/RuleBaseProxy/listener/tun"
+	"github.com/finddiff/RuleBaseProxy/listener/tun/forward"
 	"net"
 	"strconv"
 	"sync"
 
-	"github.com/finddiff/clashWithCache/adapter/inbound"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/listener/http"
-	"github.com/finddiff/clashWithCache/listener/mixed"
-	"github.com/finddiff/clashWithCache/listener/redir"
-	"github.com/finddiff/clashWithCache/listener/socks"
-	"github.com/finddiff/clashWithCache/listener/tproxy"
-	"github.com/finddiff/clashWithCache/log"
+	"github.com/finddiff/RuleBaseProxy/adapter/inbound"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/listener/http"
+	"github.com/finddiff/RuleBaseProxy/listener/mixed"
+	"github.com/finddiff/RuleBaseProxy/listener/redir"
+	"github.com/finddiff/RuleBaseProxy/listener/socks"
+	"github.com/finddiff/RuleBaseProxy/listener/tproxy"
+	"github.com/finddiff/RuleBaseProxy/log"
 )
 
 var (

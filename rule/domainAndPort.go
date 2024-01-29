@@ -1,7 +1,7 @@
 package rules
 
 import (
-	C "github.com/finddiff/clashWithCache/constant"
+	C "github.com/finddiff/RuleBaseProxy/constant"
 	"strconv"
 	"strings"
 )

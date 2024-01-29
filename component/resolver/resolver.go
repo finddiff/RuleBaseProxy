@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/finddiff/clashWithCache/component/trie"
+	"github.com/finddiff/RuleBaseProxy/component/trie"
 )
 
 var (

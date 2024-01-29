@@ -17,7 +17,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/finddiff/clashWithCache/common/pool"
+	"github.com/finddiff/RuleBaseProxy/common/pool"
 	"go.uber.org/atomic"
 	"golang.org/x/net/http2"
 )

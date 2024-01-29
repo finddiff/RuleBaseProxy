@@ -5,7 +5,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/finddiff/clashWithCache/common/singledo"
+	"github.com/finddiff/RuleBaseProxy/common/singledo"
 )
 
 type Interface struct {

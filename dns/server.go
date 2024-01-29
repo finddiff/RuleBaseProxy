@@ -4,9 +4,9 @@ import (
 	"errors"
 	"net"
 
-	"github.com/finddiff/clashWithCache/common/sockopt"
-	"github.com/finddiff/clashWithCache/context"
-	"github.com/finddiff/clashWithCache/log"
+	"github.com/finddiff/RuleBaseProxy/common/sockopt"
+	"github.com/finddiff/RuleBaseProxy/context"
+	"github.com/finddiff/RuleBaseProxy/log"
 
 	D "github.com/miekg/dns"
 )

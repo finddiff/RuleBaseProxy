@@ -7,7 +7,7 @@ import (
 	"errors"
 	"net"
 
-	"github.com/finddiff/clashWithCache/transport/socks5"
+	"github.com/finddiff/RuleBaseProxy/transport/socks5"
 )
 
 func parserPacket(conn net.Conn) (socks5.Addr, error) {

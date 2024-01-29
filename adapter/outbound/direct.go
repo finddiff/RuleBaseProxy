@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"github.com/dgraph-io/ristretto"
-	"github.com/finddiff/clashWithCache/component/dialer"
-	"github.com/finddiff/clashWithCache/component/resolver"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/log"
+	"github.com/finddiff/RuleBaseProxy/component/dialer"
+	"github.com/finddiff/RuleBaseProxy/component/resolver"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/log"
 	"net"
 )
 

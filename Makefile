@@ -2,12 +2,12 @@ NAME=clash
 BINDIR=bin
 VERSION=$(shell git describe --tags || echo "unknown version")
 BUILDTIME=$(shell date)
-GOBUILD=CGO_ENABLED=0 go build -trimpath -ldflags '-X "github.com/finddiff/clashWithCache/constant.Version=$(VERSION)" \
-		-X "github.com/finddiff/clashWithCache/constant.BuildTime=$(BUILDTIME)" \
+GOBUILD=CGO_ENABLED=0 go build -trimpath -ldflags '-X "github.com/finddiff/RuleBaseProxy/constant.Version=$(VERSION)" \
+		-X "github.com/finddiff/RuleBaseProxy/constant.BuildTime=$(BUILDTIME)" \
 		-w -s -buildid='
 
-#GOBUILD=CGO_ENABLED=0 go build -trimpath -ldflags '-X "github.com/finddiff/clashWithCache/constant.Version=$(VERSION)" \
-#		-X "github.com/finddiff/clashWithCache/constant.BuildTime=$(BUILDTIME)" \
+#GOBUILD=CGO_ENABLED=0 go build -trimpath -ldflags '-X "github.com/finddiff/RuleBaseProxy/constant.Version=$(VERSION)" \
+#		-X "github.com/finddiff/RuleBaseProxy/constant.BuildTime=$(BUILDTIME)" \
 #		-buildid=' -gcflags="all=-N -l"
 
 PLATFORM_LIST = \

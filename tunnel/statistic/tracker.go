@@ -4,7 +4,7 @@ import (
 	"net"
 	"time"
 
-	C "github.com/finddiff/clashWithCache/constant"
+	C "github.com/finddiff/RuleBaseProxy/constant"
 
 	"github.com/gofrs/uuid"
 )

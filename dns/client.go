@@ -7,8 +7,8 @@ import (
 	"net"
 	"strings"
 
-	"github.com/finddiff/clashWithCache/component/dialer"
-	"github.com/finddiff/clashWithCache/component/resolver"
+	"github.com/finddiff/RuleBaseProxy/component/dialer"
+	"github.com/finddiff/RuleBaseProxy/component/resolver"
 
 	D "github.com/miekg/dns"
 )

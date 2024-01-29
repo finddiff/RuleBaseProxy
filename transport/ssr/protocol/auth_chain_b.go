@@ -4,7 +4,7 @@ import (
 	"net"
 	"sort"
 
-	"github.com/finddiff/clashWithCache/transport/ssr/tools"
+	"github.com/finddiff/RuleBaseProxy/transport/ssr/tools"
 )
 
 func init() {

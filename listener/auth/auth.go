@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"github.com/finddiff/clashWithCache/component/auth"
+	"github.com/finddiff/RuleBaseProxy/component/auth"
 )
 
 var (

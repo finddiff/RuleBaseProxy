@@ -3,7 +3,7 @@ package rules
 import (
 	"strconv"
 
-	C "github.com/finddiff/clashWithCache/constant"
+	C "github.com/finddiff/RuleBaseProxy/constant"
 )
 
 type Port struct {

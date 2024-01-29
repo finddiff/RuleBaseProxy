@@ -6,9 +6,9 @@ import (
 	"net"
 	"time"
 
-	"github.com/finddiff/clashWithCache/common/pool"
-	"github.com/finddiff/clashWithCache/component/resolver"
-	C "github.com/finddiff/clashWithCache/constant"
+	"github.com/finddiff/RuleBaseProxy/common/pool"
+	"github.com/finddiff/RuleBaseProxy/component/resolver"
+	C "github.com/finddiff/RuleBaseProxy/constant"
 )
 
 func handleUDPToRemote(packet C.UDPPacket, pc C.PacketConn, metadata *C.Metadata) error {
@@ -111,7 +111,7 @@ func relay(leftConn, rightConn net.Conn) {
 //	go func() {
 //		buf := pool.Get(pool.RelayBufferSize)
 //		// Wrapping to avoid using *net.TCPConn.(ReadFrom)
-//		// See also https://github.com/finddiff/clashWithCache/pull/1209
+//		// See also https://github.com/finddiff/RuleBaseProxy/pull/1209
 //		_, err := io.CopyBuffer(N.WriteOnlyWriter{Writer: leftConn}, N.ReadOnlyReader{Reader: rightConn}, buf)
 //		pool.Put(buf)
 //		leftConn.SetReadDeadline(time.Now())

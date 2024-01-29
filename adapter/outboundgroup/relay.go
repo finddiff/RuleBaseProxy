@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/finddiff/clashWithCache/adapter/outbound"
-	"github.com/finddiff/clashWithCache/common/singledo"
-	"github.com/finddiff/clashWithCache/component/dialer"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/constant/provider"
+	"github.com/finddiff/RuleBaseProxy/adapter/outbound"
+	"github.com/finddiff/RuleBaseProxy/common/singledo"
+	"github.com/finddiff/RuleBaseProxy/component/dialer"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/constant/provider"
 )
 
 type Relay struct {

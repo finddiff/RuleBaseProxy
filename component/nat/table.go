@@ -3,7 +3,7 @@ package nat
 import (
 	"sync"
 
-	C "github.com/finddiff/clashWithCache/constant"
+	C "github.com/finddiff/RuleBaseProxy/constant"
 )
 
 type Table struct {

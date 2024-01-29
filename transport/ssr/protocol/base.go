@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/finddiff/clashWithCache/common/pool"
-	"github.com/finddiff/clashWithCache/log"
+	"github.com/finddiff/RuleBaseProxy/common/pool"
+	"github.com/finddiff/RuleBaseProxy/log"
 
 	"github.com/Dreamacro/go-shadowsocks2/core"
 )

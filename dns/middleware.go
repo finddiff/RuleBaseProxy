@@ -5,11 +5,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/finddiff/clashWithCache/common/cache"
-	"github.com/finddiff/clashWithCache/component/fakeip"
-	"github.com/finddiff/clashWithCache/component/trie"
-	"github.com/finddiff/clashWithCache/context"
-	"github.com/finddiff/clashWithCache/log"
+	"github.com/finddiff/RuleBaseProxy/common/cache"
+	"github.com/finddiff/RuleBaseProxy/component/fakeip"
+	"github.com/finddiff/RuleBaseProxy/component/trie"
+	"github.com/finddiff/RuleBaseProxy/context"
+	"github.com/finddiff/RuleBaseProxy/log"
 
 	D "github.com/miekg/dns"
 )

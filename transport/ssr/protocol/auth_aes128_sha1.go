@@ -9,9 +9,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/finddiff/clashWithCache/common/pool"
-	"github.com/finddiff/clashWithCache/log"
-	"github.com/finddiff/clashWithCache/transport/ssr/tools"
+	"github.com/finddiff/RuleBaseProxy/common/pool"
+	"github.com/finddiff/RuleBaseProxy/log"
+	"github.com/finddiff/RuleBaseProxy/transport/ssr/tools"
 )
 
 type hmacMethod func(key, data []byte) []byte

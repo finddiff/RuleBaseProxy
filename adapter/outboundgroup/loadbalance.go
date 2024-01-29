@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/finddiff/clashWithCache/adapter/outbound"
-	"github.com/finddiff/clashWithCache/common/murmur3"
-	"github.com/finddiff/clashWithCache/common/singledo"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/constant/provider"
+	"github.com/finddiff/RuleBaseProxy/adapter/outbound"
+	"github.com/finddiff/RuleBaseProxy/common/murmur3"
+	"github.com/finddiff/RuleBaseProxy/common/singledo"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/constant/provider"
 
 	"golang.org/x/net/publicsuffix"
 )

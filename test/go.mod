@@ -3,7 +3,7 @@ module clash-test
 go 1.17
 
 require (
-	github.com/finddiff/clashWithCache v1.6.6-0.20210905062555-c7b718f6512d
+	github.com/finddiff/RuleBaseProxy v1.6.6-0.20210905062555-c7b718f6512d
 	github.com/docker/docker v20.10.8+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/miekg/dns v1.1.43
@@ -11,7 +11,7 @@ require (
 	golang.org/x/net v0.0.0-20210903162142-ad29c8ab022f
 )
 
-replace github.com/finddiff/clashWithCache => ../
+replace github.com/finddiff/RuleBaseProxy => ../
 
 require (
 	github.com/Dreamacro/go-shadowsocks2 v0.1.7 // indirect

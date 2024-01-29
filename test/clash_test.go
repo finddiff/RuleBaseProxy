@@ -15,10 +15,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/finddiff/clashWithCache/adapter/outbound"
-	C "github.com/finddiff/clashWithCache/constant"
-	"github.com/finddiff/clashWithCache/hub/executor"
-	"github.com/finddiff/clashWithCache/transport/socks5"
+	"github.com/finddiff/RuleBaseProxy/adapter/outbound"
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/hub/executor"
+	"github.com/finddiff/RuleBaseProxy/transport/socks5"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"

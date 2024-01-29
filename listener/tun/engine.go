@@ -3,7 +3,7 @@ package tun
 import (
 	"errors"
 	"github.com/docker/go-units"
-	"github.com/finddiff/clashWithCache/listener/tun/forward"
+	"github.com/finddiff/RuleBaseProxy/listener/tun/forward"
 	"net"
 	"os/exec"
 	"strings"
