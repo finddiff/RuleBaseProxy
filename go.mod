@@ -26,7 +26,7 @@ require (
 	golang.org/x/sync v0.6.0
 	golang.org/x/sys v0.16.0
 	gopkg.in/yaml.v2 v2.4.0
-	gvisor.dev/gvisor v0.0.0-20230603040744-5c9219dedd33
+	gvisor.dev/gvisor v0.0.0-20231024051821-3b00acd67af2
 )
 
 require (

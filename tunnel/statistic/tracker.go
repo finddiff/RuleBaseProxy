@@ -28,6 +28,7 @@ type trackerInfo struct {
 	Chain       C.Chain   `json:"chains"`
 	Rule        string    `json:"rule"`
 	RulePayload string    `json:"rulePayload"`
+	MarkGC      bool      `json:"markGC"`
 }
 
 type tcpTracker struct {
@@ -65,13 +66,11 @@ func (tt *tcpTracker) Write(b []byte) (int, error) {
 }
 
 func (tt *tcpTracker) Close() error {
-	//go func() {
-	//	// 增加延迟时间，在3秒后关闭，在web端能观察到异常关闭情况。
-	//	if time.Now().Sub(tt.Start) < time.Duration(3)*time.Second {
-	//		time.Sleep(time.Duration(3) * time.Second)
-	//	}
-	//	tt.manager.Leave(tt)
-	//}()
+	if tt.Chain[len(tt.Chain)-1] == "ERROR" && tt.MarkGC == false {
+		//对于出现error的连接，标记为待回收，由待回收机制进行回收
+		tt.MarkGC = true
+		return nil
+	}
 
 	tt.manager.Leave(tt)
 
@@ -108,6 +107,7 @@ func NewTCPTracker(conn C.Conn, manager *Manager, metadata *C.Metadata, rule C.R
 			TempUpload:    0,
 			DownloadTotal: 0,
 			TempDownload:  0,
+			MarkGC:        false,
 		},
 	}
 
@@ -166,13 +166,11 @@ func (ut *udpTracker) WriteTo(b []byte, addr net.Addr) (int, error) {
 }
 
 func (ut *udpTracker) Close() error {
-	go func() {
-		// 增加延迟时间，在3秒后关闭，在web端能观察到异常关闭情况。
-		if time.Now().Sub(ut.Start) < time.Duration(3)*time.Second {
-			time.Sleep(time.Duration(3) * time.Second)
-		}
-		ut.manager.Leave(ut)
-	}()
+	if ut.Chain[len(ut.Chain)-1] == "ERROR" && ut.MarkGC == false {
+		//对于出现error的连接，标记为待回收，由待回收机制进行回收
+		ut.MarkGC = true
+		return nil
+	}
 
 	if ut.PacketConn == nil {
 		return nil
@@ -200,6 +198,7 @@ func NewUDPTracker(conn C.PacketConn, manager *Manager, metadata *C.Metadata, ru
 			TempUpload:    0,
 			DownloadTotal: 0,
 			TempDownload:  0,
+			MarkGC:        false,
 		},
 	}
 

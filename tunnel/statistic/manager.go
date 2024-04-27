@@ -25,6 +25,7 @@ func init() {
 	}
 
 	go DefaultManager.handle()
+	go DefaultManager.end_errors_conn()
 }
 
 type Manager struct {
@@ -132,6 +133,24 @@ func (m *Manager) handle() {
 		m.downloadBlip = allTemDownLoad
 		m.uploadTotal += allTempUpload
 		m.downloadTotal += allTemDownLoad
+	}
+}
+
+func (m *Manager) end_errors_conn() {
+	ticker := time.NewTicker(time.Second * 3)
+
+	for range ticker.C {
+		m.connections.Range(func(key, value interface{}) bool {
+			tinfo := value.(tracker).TrackerInfo()
+			if tinfo.Chain[len(tinfo.Chain)-1] == "ERROR" {
+				//对于 出现error的连接回出现两次调用Close，第一次设置回收标志MarkGC，第二次进行关闭 回收时间最短3s 最长6s
+				err := value.(tracker).Close()
+				if err != nil {
+					return true
+				}
+			}
+			return true
+		})
 	}
 }
 
