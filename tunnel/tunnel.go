@@ -229,7 +229,7 @@ func handleUDPConn(packet *inbound.PacketAdapter) {
 	handle := func() bool {
 		pc := natTable.Get(key)
 		if pc != nil {
-			handleUDPToRemote(packet, pc, metadata)
+			handleUDPToRemote(packet, pc, metadata, key)
 			return true
 		}
 		return false

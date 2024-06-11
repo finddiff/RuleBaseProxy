@@ -11,7 +11,7 @@ import (
 	C "github.com/finddiff/RuleBaseProxy/constant"
 )
 
-func handleUDPToRemote(packet C.UDPPacket, pc C.PacketConn, metadata *C.Metadata) error {
+func handleUDPToRemote(packet C.UDPPacket, pc C.PacketConn, metadata *C.Metadata, key string) error {
 	defer packet.Drop()
 
 	// local resolve UDP dns
@@ -31,10 +31,13 @@ func handleUDPToRemote(packet C.UDPPacket, pc C.PacketConn, metadata *C.Metadata
 	}
 
 	if _, err := pc.WriteTo(packet.Data(), addr); err != nil {
+		natTable.Delete(key)
+		pc.Close()
 		return err
 	}
 	// reset timeout
-	pc.SetReadDeadline(time.Now().Add(udpTimeout))
+	//pc.SetReadDeadline(time.Now().Add(udpTimeout))
+	pc.SetDeadline(time.Now().Add(udpTimeout))
 
 	return nil
 }
@@ -46,7 +49,8 @@ func handleUDPToLocal(packet C.UDPPacket, pc net.PacketConn, key string, fAddr n
 	defer pc.Close()
 
 	for {
-		pc.SetReadDeadline(time.Now().Add(udpTimeout))
+		//pc.SetReadDeadline(time.Now().Add(udpTimeout))
+		pc.SetDeadline(time.Now().Add(udpTimeout))
 		n, from, err := pc.ReadFrom(buf)
 		if err != nil {
 			return
