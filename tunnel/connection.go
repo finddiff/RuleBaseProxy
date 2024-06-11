@@ -9,6 +9,7 @@ import (
 	"github.com/finddiff/RuleBaseProxy/common/pool"
 	"github.com/finddiff/RuleBaseProxy/component/resolver"
 	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/log"
 )
 
 func handleUDPToRemote(packet C.UDPPacket, pc C.PacketConn, metadata *C.Metadata, key string) error {
@@ -30,6 +31,13 @@ func handleUDPToRemote(packet C.UDPPacket, pc C.PacketConn, metadata *C.Metadata
 		return errors.New("udp addr invalid")
 	}
 
+	timeOut := udpTimeout
+	if addr != nil {
+		if addr.Port == 53 {
+			timeOut = 5 * time.Second
+		}
+	}
+
 	if _, err := pc.WriteTo(packet.Data(), addr); err != nil {
 		natTable.Delete(key)
 		pc.Close()
@@ -37,7 +45,8 @@ func handleUDPToRemote(packet C.UDPPacket, pc C.PacketConn, metadata *C.Metadata
 		return err
 	}
 	// reset timeout
-	pc.SetReadDeadline(time.Now().Add(udpTimeout))
+	log.Debugln("handleUDPToRemote SetReadDeadline WriteTo:%v timeOut:%v", addr, timeOut)
+	pc.SetReadDeadline(time.Now().Add(timeOut))
 	//natTable.SetEndTime(key, time.Now().Add(udpTimeout))
 	return nil
 }
@@ -48,11 +57,16 @@ func handleUDPToLocal(packet C.UDPPacket, pc net.PacketConn, key string, fAddr n
 	defer natTable.Delete(key)
 	defer natTable.DeleteEndTime(key)
 	defer pc.Close()
+	timeOut := udpTimeout
 
 	for {
-		pc.SetReadDeadline(time.Now().Add(udpTimeout))
+		log.Debugln("handleUDPToLocal SetReadDeadline WriteTo:%v timeOut:%v", fAddr, timeOut)
+		pc.SetReadDeadline(time.Now().Add(timeOut))
 		//natTable.SetEndTime(key, time.Now().Add(udpTimeout))
 		n, from, err := pc.ReadFrom(buf)
+		if from != nil && from.(*net.UDPAddr).Port == 53 {
+			timeOut = 5 * time.Second
+		}
 		if err != nil {
 			return
 		}
