@@ -9,7 +9,6 @@ import (
 	"github.com/finddiff/RuleBaseProxy/common/pool"
 	"github.com/finddiff/RuleBaseProxy/component/resolver"
 	C "github.com/finddiff/RuleBaseProxy/constant"
-	"github.com/finddiff/RuleBaseProxy/log"
 )
 
 func handleUDPToRemote(packet C.UDPPacket, pc C.PacketConn, metadata *C.Metadata, key string) error {
@@ -45,7 +44,7 @@ func handleUDPToRemote(packet C.UDPPacket, pc C.PacketConn, metadata *C.Metadata
 		return err
 	}
 	// reset timeout
-	log.Debugln("handleUDPToRemote SetReadDeadline WriteTo:%v timeOut:%v", addr, timeOut)
+	//log.Debugln("handleUDPToRemote SetReadDeadline WriteTo:%v timeOut:%v", addr, timeOut)
 	pc.SetReadDeadline(time.Now().Add(timeOut))
 	//natTable.SetEndTime(key, time.Now().Add(udpTimeout))
 	return nil
@@ -60,7 +59,7 @@ func handleUDPToLocal(packet C.UDPPacket, pc net.PacketConn, key string, fAddr n
 	timeOut := udpTimeout
 
 	for {
-		log.Debugln("handleUDPToLocal SetReadDeadline WriteTo:%v timeOut:%v", fAddr, timeOut)
+		//log.Debugln("handleUDPToLocal SetReadDeadline WriteTo:%v timeOut:%v", fAddr, timeOut)
 		pc.SetReadDeadline(time.Now().Add(timeOut))
 		//natTable.SetEndTime(key, time.Now().Add(udpTimeout))
 		n, from, err := pc.ReadFrom(buf)
