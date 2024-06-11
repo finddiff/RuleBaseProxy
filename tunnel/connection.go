@@ -43,9 +43,9 @@ func handleUDPToLocal(packet C.UDPPacket, pc net.PacketConn, key string, fAddr n
 	buf := pool.Get(pool.RelayBufferSize)
 	defer pool.Put(buf)
 	defer natTable.Delete(key)
+	defer pc.Close()
 
 	for {
-		defer pc.Close()
 		pc.SetReadDeadline(time.Now().Add(udpTimeout))
 		n, from, err := pc.ReadFrom(buf)
 		if err != nil {

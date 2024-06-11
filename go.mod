@@ -7,7 +7,7 @@ require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/dgraph-io/ristretto v0.1.1
 	github.com/docker/go-units v0.5.0
-	github.com/finddiff/nutsDBMD v0.1.45
+	github.com/finddiff/nutsDBMD v0.1.48
 	github.com/go-chi/chi/v5 v5.0.11
 	github.com/go-chi/cors v1.2.1
 	github.com/go-chi/render v1.0.3

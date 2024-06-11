@@ -18,8 +18,8 @@ github.com/docker/go-units v0.5.0 h1:69rxXcBk27SvSaaxTtLh/8llcHD8vYHT7WSdRZ/jvr4
 github.com/docker/go-units v0.5.0/go.mod h1:fgPhTUdO+D/Jk86RDLlptpiXQzgHJF7gydDDbaIK4Dk=
 github.com/dustin/go-humanize v1.0.0 h1:VSnTsYCnlFHaM2/igO1h6X3HA71jcobQuxemgkq4zYo=
 github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
-github.com/finddiff/nutsDBMD v0.1.45 h1:SRU52WJtDd0l7SuOSIwAJAz4K7s5o0+f5SRUbehXYGM=
-github.com/finddiff/nutsDBMD v0.1.45/go.mod h1:RSQUGB1iUAsK8xkp3cN4GEJE1AFF9FwDbbOnQepaUzk=
+github.com/finddiff/nutsDBMD v0.1.48 h1:XPBA7SFb7q10H5eZqWx52hmLNdUTlPd7iwzTit75BOs=
+github.com/finddiff/nutsDBMD v0.1.48/go.mod h1:RSQUGB1iUAsK8xkp3cN4GEJE1AFF9FwDbbOnQepaUzk=
 github.com/go-chi/chi/v5 v5.0.11 h1:BnpYbFZ3T3S1WMpD79r7R5ThWX40TaFB7L31Y8xqSwA=
 github.com/go-chi/chi/v5 v5.0.11/go.mod h1:DslCQbL2OYiznFReuXYUmQ2hGd1aDpCnlMNITLSKoi8=
 github.com/go-chi/cors v1.2.1 h1:xEC8UT3Rlp2QuWNEr4Fs/c2EAGVKBwy/1vHx3bppil4=
