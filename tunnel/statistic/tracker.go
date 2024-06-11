@@ -172,6 +172,8 @@ func (ut *udpTracker) Close() error {
 		return nil
 	}
 
+	ut.manager.Leave(ut)
+
 	if ut.PacketConn == nil {
 		return nil
 	}

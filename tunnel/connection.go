@@ -33,12 +33,12 @@ func handleUDPToRemote(packet C.UDPPacket, pc C.PacketConn, metadata *C.Metadata
 	if _, err := pc.WriteTo(packet.Data(), addr); err != nil {
 		natTable.Delete(key)
 		pc.Close()
+		//log.Debugln("handleUDPToRemote WriteTo:%v err:%v", addr, err)
 		return err
 	}
 	// reset timeout
-	//pc.SetReadDeadline(time.Now().Add(udpTimeout))
-	pc.SetDeadline(time.Now().Add(udpTimeout))
-
+	pc.SetReadDeadline(time.Now().Add(udpTimeout))
+	//natTable.SetEndTime(key, time.Now().Add(udpTimeout))
 	return nil
 }
 
@@ -46,11 +46,12 @@ func handleUDPToLocal(packet C.UDPPacket, pc net.PacketConn, key string, fAddr n
 	buf := pool.Get(pool.RelayBufferSize)
 	defer pool.Put(buf)
 	defer natTable.Delete(key)
+	defer natTable.DeleteEndTime(key)
 	defer pc.Close()
 
 	for {
-		//pc.SetReadDeadline(time.Now().Add(udpTimeout))
-		pc.SetDeadline(time.Now().Add(udpTimeout))
+		pc.SetReadDeadline(time.Now().Add(udpTimeout))
+		//natTable.SetEndTime(key, time.Now().Add(udpTimeout))
 		n, from, err := pc.ReadFrom(buf)
 		if err != nil {
 			return

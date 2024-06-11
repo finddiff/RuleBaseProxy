@@ -103,6 +103,29 @@ func processTCP() {
 	}
 }
 
+//func processNotUserUDP() {
+//	ticker := time.NewTicker(10 * time.Second)
+//	for {
+//		<-ticker.C
+//		nowTime := time.Now()
+//		natTable.TimeMap.Range(func(k, v interface{}) bool {
+//			endTime := v.(time.Time)
+//			log.Debugln("processNotUserUDP nowTime:%v k:%v v:%v", nowTime, k, v)
+//			if endTime.Before(nowTime) {
+//				key := k.(string)
+//				log.Debugln("processNotUserUDP key:%v", key)
+//				pc := natTable.Get(key)
+//				log.Debugln("processNotUserUDP pc:%v", pc)
+//				if pc != nil {
+//					log.Debugln("processNotUserUDP close udp:%v endtime:%v", pc.LocalAddr(), endTime)
+//					pc.Close()
+//				}
+//			}
+//			return true
+//		})
+//	}
+//}
+
 func process() {
 	numUDPWorkers := 4
 	if runtime.NumCPU() > numUDPWorkers {
@@ -112,6 +135,8 @@ func process() {
 		go processUDP()
 		go processTCP()
 	}
+
+	//go processNotUserUDP()
 
 	//tun.tunprocess()
 

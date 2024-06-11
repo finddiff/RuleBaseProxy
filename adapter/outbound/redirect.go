@@ -2,13 +2,12 @@ package outbound
 
 import (
 	"context"
-	"github.com/finddiff/RuleBaseProxy/component/resolver"
-	"net"
-	"strconv"
-
 	"github.com/finddiff/RuleBaseProxy/component/dialer"
+	"github.com/finddiff/RuleBaseProxy/component/resolver"
 	C "github.com/finddiff/RuleBaseProxy/constant"
 	"github.com/finddiff/RuleBaseProxy/log"
+	"net"
+	"strconv"
 )
 
 type ReDirect struct {
@@ -63,7 +62,7 @@ func (r *redirectPacketConn) WriteTo(b []byte, addr net.Addr) (n int, err error)
 }
 
 func (r *redirectPacketConn) ReadFrom(b []byte) (int, net.Addr, error) {
-	log.Debugln("redirectPacketConn ReadFrom:%v, ", r.sourceUDPAddr)
+	log.Debugln("redirectPacketConn ReadFrom:%v", r.sourceUDPAddr)
 	n, _, e := r.PacketConn.ReadFrom(b)
 	if e != nil {
 		return 0, nil, e
