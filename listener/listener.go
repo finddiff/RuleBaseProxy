@@ -284,7 +284,7 @@ func ReCreateMixed(port int, tcpIn chan<- C.ConnContext, udpIn chan<- *inbound.P
 	return nil
 }
 
-func ReCreateTun(TunDevice, TUNPreUp, TUNPostUp string, tcpIn chan<- C.ConnContext, udpIn chan<- *inbound.PacketAdapter) error {
+func ReCreateTun(TunDevice string, TUNPreUp, TUNPostUp []string, tcpIn chan<- C.ConnContext, udpIn chan<- *inbound.PacketAdapter) error {
 	//tun.Insert()
 	//maxprocs.Set(maxprocs.Logger(func(string, ...any) {}))
 	if TunDevice == "" {

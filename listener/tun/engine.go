@@ -6,6 +6,7 @@ import (
 	"github.com/finddiff/RuleBaseProxy/listener/tun/forward"
 	"net"
 	"os/exec"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -38,6 +39,21 @@ var (
 	// _defaultStack holds the default stack for the engine.
 	_defaultStack *stack.Stack
 )
+
+func getInterfaceIndex(name string) int {
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		log.Infof("获取网卡信息失败:", err)
+		return 0
+	}
+	for _, inter := range interfaces {
+		log.Infof("接口名字: %v\n", inter.Name)
+		if inter.Name == name {
+			return inter.Index
+		}
+	}
+	return 0
+}
 
 // Start starts the default engine up.
 func Start() {
@@ -170,18 +186,29 @@ func netstack(k *Key) (err error) {
 		return errors.New("empty device")
 	}
 
-	if k.TUNPreUp != "" {
-		if preUpErr := ExecCommand(k.TUNPreUp); preUpErr != nil {
-			log.Warnf("[TUN] failed to pre-execute: %s: %v", k.TUNPreUp, preUpErr)
+	if k.TUNPreUp != nil && len(k.TUNPreUp) != 0 {
+		for index := 0; index < len(k.TUNPreUp); index++ {
+			if preUpErr := ExecCommand(k.TUNPreUp[index]); preUpErr != nil {
+				log.Warnf("[TUN] failed to pre-execute: %s: %v", k.TUNPreUp, preUpErr)
+			}
 		}
 	}
 
 	defer func() {
-		if k.TUNPostUp == "" || err != nil {
+		ifindex := getInterfaceIndex(k.Device)
+		if ifindex == 0 {
+			log.Warnf("[TUN] failed to find if index: %d", ifindex)
 			return
 		}
-		if postUpErr := ExecCommand(k.TUNPostUp); postUpErr != nil {
-			log.Warnf("[TUN] failed to post-execute: %s: %v", k.TUNPostUp, postUpErr)
+		log.Infof("[TUN] find index:%d", ifindex)
+		if k.TUNPostUp == nil || len(k.TUNPreUp) == 0 || err != nil {
+			return
+		}
+		for index := 0; index < len(k.TUNPostUp); index++ {
+			if postUpErr := ExecCommand(strings.ReplaceAll(k.TUNPostUp[index], "$IFIndex", strconv.Itoa(ifindex))); postUpErr != nil {
+				log.Warnf("[TUN] failed to post-execute: %s: %v", k.TUNPostUp[index], postUpErr)
+				//time.Sleep(10 * time.Second)
+			}
 		}
 	}()
 

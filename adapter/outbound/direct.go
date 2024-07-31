@@ -25,6 +25,9 @@ type Direct struct {
 
 // DialContext implements C.ProxyAdapter
 func (d *Direct) DialContext(ctx context.Context, metadata *C.Metadata) (C.Conn, error) {
+	if metadata.Type == C.WINTUN {
+		return nil, errors.New("Tun mode cannot DialContext by Direct")
+	}
 	var c net.Conn
 	c = nil
 	var err error
@@ -104,6 +107,9 @@ func (d *Direct) orgDialContext(ctx context.Context, metadata *C.Metadata) (C.Co
 
 // DialUDP implements C.ProxyAdapter
 func (d *Direct) DialUDP(metadata *C.Metadata) (C.PacketConn, error) {
+	if metadata.Type == C.WINTUN {
+		return nil, errors.New("Tun mode cannot dailUDP by Direct")
+	}
 	pc, err := dialer.ListenPacket(context.Background(), "udp", "")
 	if err != nil {
 		return nil, err

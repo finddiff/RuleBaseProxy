@@ -288,11 +288,6 @@ func handleUDPConn(packet *inbound.PacketAdapter) {
 			return
 		}
 
-		if metadata.Type == C.WINTUN && proxy != nil && proxy.Type() == C.Direct {
-			log.Warnln("[UDP] tun proxy not user direct")
-			return
-		}
-
 		//if err := afterHandleMetadata(metadata); err != nil {
 		//	log.Debugln("[Metadata afterHandle] error: %s", err)
 		//	return
@@ -367,10 +362,6 @@ func handleTCPConn(ctx C.ConnContext) {
 		return
 	}
 
-	if metadata.Type == C.WINTUN && proxy != nil && proxy.Type() == C.Direct {
-		log.Warnln("[UDP] tun proxy not user direct")
-		return
-	}
 	//log.Infoln("handleTCPConn after resolveMetadata infokey:%s", metadata.InfoKey())
 
 	//tcpTrack := statistic.NewTCPTracker(nil, statistic.DefaultManager, metadata, rule, proxy)

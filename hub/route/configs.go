@@ -36,8 +36,8 @@ type configSchema struct {
 	LogLevel    *log.LogLevel      `json:"log-level"`
 	IPv6        *bool              `json:"ipv6"`
 	TunDevice   string             `json:"tun-device"`
-	TUNPreUp    string             `json:"tun-preup"`
-	TUNPostUp   string             `json:"tun-postup"`
+	TUNPreUp    []string           `json:"tun-preup"`
+	TUNPostUp   []string           `json:"tun-postup"`
 }
 
 func getConfigs(w http.ResponseWriter, r *http.Request) {

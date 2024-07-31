@@ -46,8 +46,8 @@ type Inbound struct {
 	AllowLan       bool     `json:"allow-lan"`
 	BindAddress    string   `json:"bind-address"`
 	TunDevice      string   `json:"tun-device"`
-	TUNPreUp       string   `json:"tun-preup"`
-	TUNPostUp      string   `json:"tun-postup"`
+	TUNPreUp       []string `json:"tun-preup"`
+	TUNPostUp      []string `json:"tun-postup"`
 }
 
 // Controller
@@ -144,8 +144,8 @@ type RawConfig struct {
 	ExternalCMD        string       `yaml:"external-cmd"`
 	Interface          string       `yaml:"interface-name"`
 	TunDevice          string       `yaml:"tun-device"`
-	TUNPreUp           string       `yaml:"tun-preup"`
-	TUNPostUp          string       `yaml:"tun-postup"`
+	TUNPreUp           []string     `yaml:"tun-preup"`
+	TUNPostUp          []string     `yaml:"tun-postup"`
 
 	ProxyProvider map[string]map[string]interface{} `yaml:"proxy-providers"`
 	Hosts         map[string]string                 `yaml:"hosts"`
