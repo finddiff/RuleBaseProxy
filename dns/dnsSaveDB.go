@@ -100,7 +100,8 @@ func loadToIPDomainMap(mapping *cache.LruCache) {
 			domainStr := string(entry.Value)
 			log.Infoln("loadToIPDomainMap SetWithExpire ip:%s| host:%s| expire Time:%v| ttl:%d|", ip, domainStr, time.Second*time.Duration(3), 3)
 			mapping.SetWithExpire(ip, domainStr, time.Now().Add(time.Second*time.Duration(3)))
-			tunnel.Dm.Set(ip, domainStr, 0)
+			//tunnel.Dm.Set(ip, domainStr, 0)
+			tunnel.Dm.Add(ip, domainStr)
 		}
 		return nil
 	})

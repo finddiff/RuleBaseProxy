@@ -56,7 +56,8 @@ func Rules() []C.Rule {
 func UpdateRules(newRules []C.Rule) {
 	configMux.Lock()
 	rules = newRules
-	Cm.Clear()
+	//Cm.Clear()
+	Cm.Purge()
 	configMux.Unlock()
 }
 

@@ -13,6 +13,7 @@ require (
 	github.com/go-chi/render v1.0.3
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/gorilla/websocket v1.5.1
+	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/insomniacslk/dhcp v0.0.0-20240129002554-15c9b8791914
 	github.com/miekg/dns v1.1.58
 	github.com/oschwald/geoip2-golang v1.9.0

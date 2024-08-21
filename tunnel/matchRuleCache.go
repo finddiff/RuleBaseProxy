@@ -2,13 +2,12 @@ package tunnel
 
 import (
 	"fmt"
-	"time"
-
-	//HS "github.com/cornelk/hashmap"
-	"github.com/dgraph-io/ristretto"
 	C "github.com/finddiff/RuleBaseProxy/constant"
 	"github.com/finddiff/RuleBaseProxy/log"
 	"github.com/finddiff/RuleBaseProxy/tunnel/statistic"
+	//HS "github.com/cornelk/hashmap"
+	//"github.com/dgraph-io/ristretto"
+	"github.com/hashicorp/golang-lru/v2"
 	//"golang.org/x/sync/syncmap"
 	"net"
 )
@@ -18,22 +17,25 @@ var (
 	//Cm     = CMAP.New()
 	//Cm = CC.New(CC.Configure().MaxSize(1024 * 128).ItemsToPrune(500).Buckets(1024 * 128 / 64))
 	//Dm = CC.New(CC.Configure().MaxSize(1024 * 128).ItemsToPrune(500).Buckets(1024 * 128 / 64))
-	Cm, _ = ristretto.NewCache(&ristretto.Config{
-		NumCounters: 1e7,     // number of keys to track frequency of (10M).
-		MaxCost:     1 << 28, // maximum cost of cache (256MB).
-		BufferItems: 64,      // number of keys per Get buffer.
-	})
-	Dm, _ = ristretto.NewCache(&ristretto.Config{
-		NumCounters: 1e7,     // number of keys to track frequency of (10M).
-		MaxCost:     1 << 28, // maximum cost of cache (256MB).
-		BufferItems: 64,      // number of keys per Get buffer.
-	})
+	//Cm, _ = ristretto.NewCache(&ristretto.Config{
+	//	NumCounters: 1e7,     // number of keys to track frequency of (10M).
+	//	MaxCost:     1 << 28, // maximum cost of cache (256MB).
+	//	BufferItems: 64,      // number of keys per Get buffer.
+	//})
+	//Dm, _ = ristretto.NewCache(&ristretto.Config{
+	//	NumCounters: 1e7,     // number of keys to track frequency of (10M).
+	//	MaxCost:     1 << 28, // maximum cost of cache (256MB).
+	//	BufferItems: 64,      // number of keys per Get buffer.
+	//})
 	//Am = &HS.HashMap{}
 	//Bm = syncmap.Map{}
 	//Am.Set("amount", 123)
 	//TimeCm = CMAP.New()
 	//RulChan = make(chan string, 10000)
 	//Cm = concurrent_map.CreateConcurrentMap(1024)
+
+	Cm, _ = lru.New[string, any](1024 * 1024)
+	Dm, _ = lru.New[string, any](1024 * 1024)
 )
 
 func DnsPreCache(domain string, ip string, remote net.Addr, ttl uint32) {
@@ -65,8 +67,9 @@ func DnsPreCache(domain string, ip string, remote net.Addr, ttl uint32) {
 	//if dur, ok := Dm.GetTTL(ip); ok && dur.Seconds() > 10 {
 	//	return
 	//}
-	Dm.SetWithTTL(ip, domain, 1, time.Minute*60*24)
+	//Dm.SetWithTTL(ip, domain, 1, time.Minute*60*24)
 	//Dm.SetWithTTL(ip, domain, 1, time.Duration(ttl)*time.Second)
+	Dm.Add(ip, domain)
 	log.Debugln("DnsPreCache cache ip:%v, domain%s", ip, domain)
 	//Dm.Set(ip, domain, time.Hour*24)
 	//TimeCm.Set(domain, 0)
@@ -75,11 +78,12 @@ func DnsPreCache(domain string, ip string, remote net.Addr, ttl uint32) {
 
 func setMatchHashMap(key string, value interface{}) {
 	//Cm.Set(key, value, time.Minute*60*24)
-	Cm.SetWithTTL(key, value, 1, time.Minute*60*24)
+	//Cm.SetWithTTL(key, value, 1, time.Minute*60*24)
 	//Bm.Store(key, value)
 	//Am.Set(key, value)
 	//Cm.Set(key, value)
 	//TimeCm.Set(key, 0)
+	Cm.Add(key, value)
 }
 
 func CloseRuleMatchCon(rule C.Rule) {

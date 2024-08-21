@@ -92,7 +92,8 @@ func updateProxy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tunnel.Cm.Clear()
+	//tunnel.Cm.Clear()
+	tunnel.Cm.Purge()
 	cachefile.Cache().SetSelected(proxy.Name(), req.Name)
 	render.NoContent(w, r)
 }
