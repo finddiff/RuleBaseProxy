@@ -17,7 +17,7 @@ import (
 type handler func(ctx *context.DNSContext, r *D.Msg) (*D.Msg, error)
 type middleware func(next handler) handler
 
-func withHosts(hosts *trie.DomainTrie) middleware {
+func withHosts(hosts *trie.DomainTrie, ipv6 bool) middleware {
 	return func(next handler) handler {
 		return func(ctx *context.DNSContext, r *D.Msg) (*D.Msg, error) {
 			q := r.Question[0]
@@ -40,7 +40,7 @@ func withHosts(hosts *trie.DomainTrie) middleware {
 				rr.A = v4
 
 				msg.Answer = []D.RR{rr}
-			} else if v6 := ip.To16(); v6 != nil && q.Qtype == D.TypeAAAA {
+			} else if v6 := ip.To16(); ipv6 && v6 != nil && q.Qtype == D.TypeAAAA {
 				rr := &D.AAAA{}
 				rr.Hdr = D.RR_Header{Name: q.Name, Rrtype: D.TypeAAAA, Class: D.ClassINET, Ttl: dnsDefaultTTL}
 				rr.AAAA = v6
@@ -181,7 +181,7 @@ func newHandler(resolver *Resolver, mapper *ResolverEnhancer) handler {
 	middlewares := []middleware{}
 
 	if resolver.hosts != nil {
-		middlewares = append(middlewares, withHosts(resolver.hosts))
+		middlewares = append(middlewares, withHosts(resolver.hosts, resolver.ipv6))
 	}
 
 	if mapper.mode == FAKEIP {
