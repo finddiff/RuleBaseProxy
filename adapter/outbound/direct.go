@@ -32,12 +32,10 @@ func (d *Direct) DialContext(ctx context.Context, metadata *C.Metadata) (C.Conn,
 	c = nil
 	var err error
 
-	if metadata.AddrType == C.AtypDomainName && (metadata.Type.String() == "HTTP" || metadata.Type.String() == "HTTP Connect" || metadata.Type.String() == "Socks4" || metadata.Type.String() == "Socks5") {
-		log.Debugln("direct DialContextHost tcp Host %s:%s infokey:%s", metadata.String(), metadata.DstPort, metadata.InfoKey())
-		c, err = dialer.DialContextHost(ctx, "tcp", metadata.String(), metadata.DstPort)
-	} else {
-		log.Debugln("direct DialContextHost tcp DstAddr %s:%s infokey:%s", metadata.DstAddr(), metadata.DstPort, metadata.InfoKey())
+	if metadata.AddrType != C.AtypDomainName {
 		c, err = dialer.DialContextHost(ctx, "tcp", metadata.DstAddr(), metadata.DstPort)
+	} else {
+		c, err = dialer.DialContextHost(ctx, "tcp", metadata.String(), metadata.DstPort)
 	}
 
 	if err != nil {

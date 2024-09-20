@@ -289,11 +289,6 @@ func handleUDPConn(packet *inbound.PacketAdapter) {
 			return
 		}
 
-		//if err := afterHandleMetadata(metadata); err != nil {
-		//	log.Debugln("[Metadata afterHandle] error: %s", err)
-		//	return
-		//}
-
 		pc := statistic.NewUDPTracker(nil, statistic.DefaultManager, metadata, rule, proxy)
 		statistic.DefaultManager.Join(pc)
 		rawPc, err := proxy.DialUDP(metadata)
@@ -363,32 +358,38 @@ func handleTCPConn(ctx C.ConnContext) {
 		return
 	}
 
-	//log.Infoln("handleTCPConn after resolveMetadata infokey:%s", metadata.InfoKey())
-
-	//tcpTrack := statistic.NewTCPTracker(nil, statistic.DefaultManager, metadata, rule, proxy)
-	//statistic.DefaultManager.Join(tcpTrack)
-	//tcpTrack := (ctx.Tracker()).(*tcpTracker)
-	//if err := afterHandleMetadata(metadata); err != nil {
-	//	log.Debugln("[Metadata afterHandle] error: %s", err)
-	//	return
-	//}
-
 	org_DstIP := metadata.DstIP
 	org_AddrType := metadata.AddrType
-	//org_Type := metadata.Type
-	if proxy.Name() != "DIRECT" && metadata.Host != "" {
-		//metadata.Type = C.SOCKS5
-		metadata.AddrType = C.AtypDomainName
-		metadata.DstIP = nil
+	MultiDomain := Dm_se.Contains(metadata.DstIP.String())
+
+	log.Debugln("tunnel handleTCPConn DstAddr %s:%s, infokey:%s, AddrType:%v, MultiDomain:%v", metadata.DstAddr(), metadata.DstPort, metadata.InfoKey(), metadata.AddrType, MultiDomain)
+	if !(metadata.Type.String() == "HTTP" || metadata.Type.String() == "HTTP Connect" || metadata.Type.String() == "Socks4" || metadata.Type.String() == "Socks5") {
+		if !MultiDomain {
+			if metadata.DstIP.To4() != nil {
+				metadata.AddrType = C.AtypIPv4
+			} else {
+				metadata.AddrType = C.AtypIPv6
+			}
+			log.Debugln("tunnel handleTCPConn dail by ip infokey:%s", metadata.InfoKey())
+		} else {
+			if metadata.Host != "" {
+				metadata.AddrType = C.AtypDomainName
+				metadata.DstIP = nil
+				log.Debugln("tunnel handleTCPConn dail by domain infokey:%s", metadata.InfoKey())
+			} else {
+				log.Debugln("tunnel handleTCPConn dail by defaule infokey:%s", metadata.InfoKey())
+			}
+		}
+
 	}
 
-	log.Debugln("proxy.Dail metadata NetWork:%v Type:%v SrcIP:%v DstIP:%v SrcPort:%v DstPort:%v AddrType:%v Host:%v", metadata.NetWork, metadata.Type, metadata.SrcIP, metadata.DstIP, metadata.SrcPort, metadata.DstPort, metadata.AddrType, metadata.Host)
+	log.Debugln("proxy(%v).Dail metadata NetWork:%v Type:%v SrcIP:%v DstIP:%v SrcPort:%v DstPort:%v AddrType:%v Host:%v", proxy.Name(), metadata.NetWork, metadata.Type, metadata.SrcIP, metadata.DstIP, metadata.SrcPort, metadata.DstPort, metadata.AddrType, metadata.Host)
 	tcpTrack.Chain = []string{"DAIL", "ERROR"}
 	remoteConn, err := proxy.Dial(metadata)
 
 	metadata.AddrType = org_AddrType
 	metadata.DstIP = org_DstIP
-	//metadata.Type = org_Type
+
 	if err != nil {
 		if rule == nil {
 			log.Warnln("[TCP] dial %s to %s error: %s", proxy.Name(), metadata.RemoteAddress(), err.Error())
