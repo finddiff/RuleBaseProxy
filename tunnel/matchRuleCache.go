@@ -14,13 +14,13 @@ import (
 
 var (
 	Cm, _    = lru.New[string, any](1024 * 1024)
-	Dm, _    = lru.New[string, any](1024 * 1024)
-	Dm_se, _ = lru.New[string, any](1024 * 1024)
+	Dm, _    = lru.New[string, string](1024 * 1024)
+	Dm_se, _ = lru.New[string, string](1024 * 1024)
 	//Dm_end_time, _ = lru.New[string, any](1024 * 1024)
 )
 
 func DnsPreCache(domain string, ip string, remote net.Addr, ttl uint32) {
-	if value, ok := Dm.Get(ip); ok && value.(string) == domain {
+	if value, ok := Dm.Get(ip); ok && value == domain {
 		Dm.Add(ip, domain)
 		log.Debugln("DnsPreCache Dm cache ip:%v, domain%s", ip, domain)
 	} else {

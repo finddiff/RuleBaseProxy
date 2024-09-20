@@ -104,29 +104,6 @@ func processTCP() {
 	}
 }
 
-//func processNotUserUDP() {
-//	ticker := time.NewTicker(10 * time.Second)
-//	for {
-//		<-ticker.C
-//		nowTime := time.Now()
-//		natTable.TimeMap.Range(func(k, v interface{}) bool {
-//			endTime := v.(time.Time)
-//			log.Debugln("processNotUserUDP nowTime:%v k:%v v:%v", nowTime, k, v)
-//			if endTime.Before(nowTime) {
-//				key := k.(string)
-//				log.Debugln("processNotUserUDP key:%v", key)
-//				pc := natTable.Get(key)
-//				log.Debugln("processNotUserUDP pc:%v", pc)
-//				if pc != nil {
-//					log.Debugln("processNotUserUDP close udp:%v endtime:%v", pc.LocalAddr(), endTime)
-//					pc.Close()
-//				}
-//			}
-//			return true
-//		})
-//	}
-//}
-
 func process() {
 	numUDPWorkers := 4
 	if runtime.NumCPU() > numUDPWorkers {
@@ -169,11 +146,15 @@ func preHandleMetadata(metadata *C.Metadata) error {
 	if needLookupIP(metadata) {
 		host, exist := resolver.FindHostByIP(metadata.DstIP)
 		if !exist {
-			item, ok := Dm.Get(metadata.DstIP.String())
-			if ok && item != nil {
+			if item, ok := Dm.Get(metadata.DstIP.String()); ok && item != "" {
 				exist = true
-				host = item.(string)
+				host = item
 			}
+
+			//if ok && item != nil {
+			//	exist = true
+			//	host = item.(string)
+			//}
 		}
 		//log.Debugln("preHandleMetadata after needLookupIP infokey:%s", metadata.InfoKey())
 
@@ -364,7 +345,7 @@ func handleTCPConn(ctx C.ConnContext) {
 
 	log.Debugln("tunnel handleTCPConn DstAddr %s:%s, infokey:%s, AddrType:%v, MultiDomain:%v", metadata.DstAddr(), metadata.DstPort, metadata.InfoKey(), metadata.AddrType, MultiDomain)
 	if !(metadata.Type.String() == "HTTP" || metadata.Type.String() == "HTTP Connect" || metadata.Type.String() == "Socks4" || metadata.Type.String() == "Socks5") {
-		if !MultiDomain {
+		if MultiDomain {
 			if metadata.DstIP.To4() != nil {
 				metadata.AddrType = C.AtypIPv4
 			} else {
