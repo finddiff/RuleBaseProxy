@@ -341,7 +341,7 @@ func handleTCPConn(ctx C.ConnContext) {
 
 	org_DstIP := metadata.DstIP
 	org_AddrType := metadata.AddrType
-	MultiDomain := Dm_se.Contains(metadata.DstIP.String())
+	MultiDomain := InSeIP(metadata.DstIP.String()) || InSeDomain(metadata.Host)
 
 	log.Debugln("tunnel handleTCPConn DstAddr %s:%s, infokey:%s, AddrType:%v, MultiDomain:%v", metadata.DstAddr(), metadata.DstPort, metadata.InfoKey(), metadata.AddrType, MultiDomain)
 	if !(metadata.Type.String() == "HTTP" || metadata.Type.String() == "HTTP Connect" || metadata.Type.String() == "Socks4" || metadata.Type.String() == "Socks5") {
@@ -351,20 +351,27 @@ func handleTCPConn(ctx C.ConnContext) {
 			} else {
 				metadata.AddrType = C.AtypIPv6
 			}
-			log.Debugln("tunnel handleTCPConn dail by ip infokey:%s", metadata.InfoKey())
+			log.Debugln("tunnel handleTCPConn dial by ip infokey:%s", metadata.InfoKey())
 		} else {
 			if metadata.Host != "" {
 				metadata.AddrType = C.AtypDomainName
 				metadata.DstIP = nil
-				log.Debugln("tunnel handleTCPConn dail by domain infokey:%s", metadata.InfoKey())
+				log.Debugln("tunnel handleTCPConn dial by domain infokey:%s", metadata.InfoKey())
 			} else {
-				log.Debugln("tunnel handleTCPConn dail by defaule infokey:%s", metadata.InfoKey())
+				log.Debugln("tunnel handleTCPConn dial by defaule infokey:%s", metadata.InfoKey())
 			}
 		}
-
 	}
 
-	log.Debugln("proxy(%v).Dail metadata NetWork:%v Type:%v SrcIP:%v DstIP:%v SrcPort:%v DstPort:%v AddrType:%v Host:%v", proxy.Name(), metadata.NetWork, metadata.Type, metadata.SrcIP, metadata.DstIP, metadata.SrcPort, metadata.DstPort, metadata.AddrType, metadata.Host)
+	Dial_type := "Dial-Unkown"
+	if metadata.AddrType == C.AtypIPv4 || metadata.AddrType == C.AtypIPv6 {
+		Dial_type = "Dial-IP"
+	}
+	if metadata.AddrType == C.AtypDomainName {
+		Dial_type = "Dial-Domain"
+	}
+
+	log.Debugln("proxy(%v).Dial metadata NetWork:%v Type:%v SrcIP:%v DstIP:%v SrcPort:%v DstPort:%v AddrType:%v Host:%v", proxy.Name(), metadata.NetWork, metadata.Type, metadata.SrcIP, metadata.DstIP, metadata.SrcPort, metadata.DstPort, metadata.AddrType, metadata.Host)
 	tcpTrack.Chain = []string{"DAIL", "ERROR"}
 	remoteConn, err := proxy.Dial(metadata)
 
@@ -387,7 +394,9 @@ func handleTCPConn(ctx C.ConnContext) {
 	}
 	tcpTrack.Chain = []string{"RECO", "ERROR"}
 	tcpTrack.Conn = remoteConn
-	tcpTrack.Chain = remoteConn.Chains()
+
+	//前台显示是通过ip连接还是通过域名连接
+	tcpTrack.Chain = append(remoteConn.Chains(), Dial_type)
 	remoteConn = tcpTrack
 	//statistic.DefaultManager.Join(tcpTrack)
 	//remoteConn = statistic.NewTCPTracker(remoteConn, statistic.DefaultManager, metadata, rule)
