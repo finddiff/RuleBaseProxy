@@ -226,6 +226,10 @@ func updateGeneral(general *config.General, force bool) {
 }
 
 func updateUsers(users []auth.AuthUser) {
+	if len(users) > 0 {
+		C.UserName = users[0].User
+		C.UserPass = users[0].Pass
+	}
 	authenticator := auth.NewAuthenticator(users)
 	authStore.SetAuthenticator(authenticator)
 	if authenticator != nil {

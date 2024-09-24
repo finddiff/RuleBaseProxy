@@ -68,6 +68,17 @@ func PreCmd(cmd string) error {
 	return tun.ExecCommand(cmd)
 }
 
+func CreateLocalSockProxy(port int) {
+	//C.SockProxy = outbound.NewSocks5(outbound.Socks5Option{
+	//	Name:     "LOCAL_SOCK_PROXY",
+	//	Server:   "LOCLA_CLASH",
+	//	Port:     port,
+	//	UDP:      true,
+	//	UserName: C.UserName,
+	//	Password: C.UserPass,
+	//})
+}
+
 func ReCreateHTTP(port int, tcpIn chan<- C.ConnContext) error {
 	httpMux.Lock()
 	defer httpMux.Unlock()
@@ -147,6 +158,7 @@ func ReCreateSocks(port int, tcpIn chan<- C.ConnContext, udpIn chan<- *inbound.P
 	socksUDPListener = udpListener
 
 	C.TunProxyString = "socks5://127.0.0.1:" + strconv.Itoa(port)
+	CreateLocalSockProxy(port)
 	log.Infoln("SOCKS proxy listening at: %s", socksListener.Address())
 	return nil
 }
@@ -280,6 +292,7 @@ func ReCreateMixed(port int, tcpIn chan<- C.ConnContext, udpIn chan<- *inbound.P
 	}
 	C.DnsProxyString = "http://127.0.0.1:" + strconv.Itoa(port)
 	C.TunProxyString = "socks5://127.0.0.1:" + strconv.Itoa(port)
+	CreateLocalSockProxy(port)
 	log.Infoln("Mixed(http+socks) proxy listening at: %s", mixedListener.Address())
 	return nil
 }

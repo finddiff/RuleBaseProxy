@@ -224,6 +224,7 @@ func loadNDSCache(resolver *Resolver, mapper *ResolverEnhancer) {
 	gob.Register(&D.SVCBLocal{})
 	gob.Register(&D.SVCBIPv4Hint{})
 	gob.Register(&D.SVCBIPv6Hint{})
+	gob.Register(&D.NS{})
 
 	db = Persistence.DB
 
