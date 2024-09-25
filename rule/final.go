@@ -5,7 +5,8 @@ import (
 )
 
 type Match struct {
-	adapter string
+	adapter           string
+	multiDomainDialip bool
 }
 
 func (f *Match) RuleType() C.RuleType {
@@ -28,8 +29,13 @@ func (f *Match) ShouldResolveIP() bool {
 	return false
 }
 
-func NewMatch(adapter string) *Match {
+func (d *Match) MultiDomainDialIP() bool {
+	return d.multiDomainDialip
+}
+
+func NewMatch(adapter string, multiDomainDialip bool) *Match {
 	return &Match{
-		adapter: adapter,
+		adapter:           adapter,
+		multiDomainDialip: multiDomainDialip,
 	}
 }

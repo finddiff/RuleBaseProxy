@@ -7,10 +7,11 @@ import (
 )
 
 type DomainAndPort struct {
-	domain   string
-	adapter  string
-	port     string
-	isSource bool
+	domain            string
+	adapter           string
+	port              string
+	isSource          bool
+	multiDomainDialip bool
 }
 
 func (d *DomainAndPort) RuleType() C.RuleType {
@@ -53,15 +54,20 @@ func (d *DomainAndPort) ShouldResolveIP() bool {
 	return false
 }
 
-func NewDomainAndPort(domain string, adapter string, port string, isSource bool) *DomainAndPort {
+func (d *DomainAndPort) MultiDomainDialIP() bool {
+	return d.multiDomainDialip
+}
+
+func NewDomainAndPort(domain string, adapter string, port string, isSource bool, multiDomainDialip bool) *DomainAndPort {
 	_, err := strconv.Atoi(port)
 	if err != nil {
 		return nil
 	}
 	return &DomainAndPort{
-		domain:   strings.ToLower(domain),
-		adapter:  adapter,
-		port:     port,
-		isSource: isSource,
+		domain:            strings.ToLower(domain),
+		adapter:           adapter,
+		port:              port,
+		isSource:          isSource,
+		multiDomainDialip: multiDomainDialip,
 	}
 }

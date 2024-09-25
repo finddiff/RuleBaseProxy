@@ -8,9 +8,10 @@ import (
 )
 
 type GEOIP struct {
-	country     string
-	adapter     string
-	noResolveIP bool
+	country           string
+	adapter           string
+	noResolveIP       bool
+	multiDomainDialip bool
 }
 
 func (g *GEOIP) RuleType() C.RuleType {
@@ -42,11 +43,16 @@ func (g *GEOIP) ShouldResolveIP() bool {
 	return !g.noResolveIP
 }
 
-func NewGEOIP(country string, adapter string, noResolveIP bool) *GEOIP {
+func (d *GEOIP) MultiDomainDialIP() bool {
+	return d.multiDomainDialip
+}
+
+func NewGEOIP(country string, adapter string, noResolveIP bool, multiDomainDialip bool) *GEOIP {
 	geoip := &GEOIP{
-		country:     country,
-		adapter:     adapter,
-		noResolveIP: noResolveIP,
+		country:           country,
+		adapter:           adapter,
+		noResolveIP:       noResolveIP,
+		multiDomainDialip: multiDomainDialip,
 	}
 
 	return geoip

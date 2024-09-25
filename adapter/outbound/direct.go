@@ -8,7 +8,6 @@ import (
 	"github.com/finddiff/RuleBaseProxy/component/resolver"
 	C "github.com/finddiff/RuleBaseProxy/constant"
 	"github.com/finddiff/RuleBaseProxy/log"
-	"github.com/finddiff/RuleBaseProxy/tunnel"
 	"net"
 )
 
@@ -32,28 +31,6 @@ func (d *Direct) DialContext(ctx context.Context, metadata *C.Metadata) (C.Conn,
 	var c net.Conn
 	c = nil
 	var err error
-
-	MultiDomain := tunnel.InSeIP(metadata.DstIP.String()) || tunnel.InSeDomain(metadata.Host)
-
-	log.Debugln("direct DialContext DstAddr %s:%s, infokey:%s, AddrType:%v, MultiDomain:%v", metadata.DstAddr(), metadata.DstPort, metadata.InfoKey(), metadata.AddrType, MultiDomain)
-	if !(metadata.Type.String() == "HTTP" || metadata.Type.String() == "HTTP Connect" || metadata.Type.String() == "Socks4" || metadata.Type.String() == "Socks5") {
-		if MultiDomain {
-			if metadata.DstIP.To4() != nil {
-				metadata.AddrType = C.AtypIPv4
-			} else {
-				metadata.AddrType = C.AtypIPv6
-			}
-			log.Debugln("direct handleTCPConn dial by ip infokey:%s", metadata.InfoKey())
-		} else {
-			if metadata.Host != "" {
-				metadata.AddrType = C.AtypDomainName
-				//metadata.DstIP = nil
-				log.Debugln("direct DialContext dial by domain infokey:%s", metadata.InfoKey())
-			} else {
-				log.Debugln("direct DialContext dial by defaule infokey:%s", metadata.InfoKey())
-			}
-		}
-	}
 
 	if metadata.AddrType != C.AtypDomainName {
 		c, err = dialer.DialContextHost(ctx, "tcp", metadata.DstAddr(), metadata.DstPort)

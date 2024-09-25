@@ -23,8 +23,10 @@ var (
 )
 
 func DnsPreCache(domain string, ip string, remote net.Addr, ttl uint32) {
-	//最小保存10s
-	ttl += 10
+	//最小保存1s
+	if ttl < 2 {
+		ttl = 2
+	}
 	now_time := time.Now()
 	end_time := now_time.Add(time.Second * time.Duration(ttl))
 	ip_se_key := ip + "_se"
@@ -35,6 +37,7 @@ func DnsPreCache(domain string, ip string, remote net.Addr, ttl uint32) {
 	//存在不一致的缓存，移动到二级缓存
 	if se_domain, ok := Dm.Get(ip); ok && se_domain != domain {
 		Dm_se.Add(ip, se_domain)
+		log.Debugln("DnsPreCache ip:%s has MultiDomain: %s,%s", ip, domain, se_domain)
 		Dm_se_domain.Add(se_domain, "")
 		if ip_end_time, ok := Dm_ttl.Get(ip); ok {
 			Dm_ttl.Add(ip_se_key, ip_end_time)

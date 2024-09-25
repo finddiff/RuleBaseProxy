@@ -7,8 +7,9 @@ import (
 )
 
 type DomainKeyword struct {
-	keyword string
-	adapter string
+	keyword           string
+	adapter           string
+	multiDomainDialip bool
 }
 
 func (dk *DomainKeyword) RuleType() C.RuleType {
@@ -35,9 +36,14 @@ func (dk *DomainKeyword) ShouldResolveIP() bool {
 	return false
 }
 
-func NewDomainKeyword(keyword string, adapter string) *DomainKeyword {
+func (d *DomainKeyword) MultiDomainDialIP() bool {
+	return d.multiDomainDialip
+}
+
+func NewDomainKeyword(keyword string, adapter string, multiDomainDialip bool) *DomainKeyword {
 	return &DomainKeyword{
-		keyword: strings.ToLower(keyword),
-		adapter: adapter,
+		keyword:           strings.ToLower(keyword),
+		adapter:           adapter,
+		multiDomainDialip: multiDomainDialip,
 	}
 }

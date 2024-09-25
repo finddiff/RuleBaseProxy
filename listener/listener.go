@@ -200,6 +200,8 @@ func ReCreateRedir(port int, tcpIn chan<- C.ConnContext, udpIn chan<- *inbound.P
 		log.Warnln("Failed to start Redir UDP Listener: %s", err)
 	}
 
+	C.FilterCacheIP = true
+
 	log.Infoln("Redirect proxy listening at: %s", redirListener.Address())
 	return nil
 }

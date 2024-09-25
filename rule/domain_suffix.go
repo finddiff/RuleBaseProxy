@@ -7,8 +7,9 @@ import (
 )
 
 type DomainSuffix struct {
-	suffix  string
-	adapter string
+	suffix            string
+	adapter           string
+	multiDomainDialip bool
 }
 
 func (ds *DomainSuffix) RuleType() C.RuleType {
@@ -35,9 +36,14 @@ func (ds *DomainSuffix) ShouldResolveIP() bool {
 	return false
 }
 
-func NewDomainSuffix(suffix string, adapter string) *DomainSuffix {
+func (d *DomainSuffix) MultiDomainDialIP() bool {
+	return d.multiDomainDialip
+}
+
+func NewDomainSuffix(suffix string, adapter string, multiDomainDialip bool) *DomainSuffix {
 	return &DomainSuffix{
-		suffix:  strings.ToLower(suffix),
-		adapter: adapter,
+		suffix:            strings.ToLower(suffix),
+		adapter:           adapter,
+		multiDomainDialip: multiDomainDialip,
 	}
 }

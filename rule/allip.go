@@ -6,7 +6,8 @@ import (
 )
 
 type AllIP struct {
-	adapter string
+	adapter           string
+	multiDomainDialip bool
 }
 
 func (f *AllIP) RuleType() C.RuleType {
@@ -36,8 +37,13 @@ func (f *AllIP) ShouldResolveIP() bool {
 	return false
 }
 
-func NewAllIP(adapter string) *AllIP {
+func (d *AllIP) MultiDomainDialIP() bool {
+	return d.multiDomainDialip
+}
+
+func NewAllIP(adapter string, multiDomainDialip bool) *AllIP {
 	return &AllIP{
-		adapter: adapter,
+		adapter:           adapter,
+		multiDomainDialip: multiDomainDialip,
 	}
 }

@@ -63,9 +63,9 @@ func handleDnsMap(dnsMap DnsMap) {
 		return
 	}
 
-	dnsMap.ttl += 30
 	tunnel.DnsPreCache(dnsMap.domain, dnsMap.ipstr, dnsMap.raddr, dnsMap.ttl)
 
+	dnsMap.ttl += 30
 	err := db.Update(func(tx *nutsdb.Tx) error {
 		//add new to maps
 		log.Debugln("DnsMapAdd add new to maps ip:%s| host:%s| expire Time:%v| ttl:%d|", dnsMap.ipstr, dnsMap.domain, time.Second*time.Duration(0), dnsMap.ttl)
@@ -75,6 +75,7 @@ func handleDnsMap(dnsMap DnsMap) {
 		}
 		return nil
 	})
+
 	if err != nil {
 		log.Errorln("DnsMapAdd db.Update(func(tx *nutsdb.Tx) error  %v", err)
 	}

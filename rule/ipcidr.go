@@ -28,12 +28,13 @@ func WithDstPort(port string) IPCIDROption {
 }
 
 type IPCIDR struct {
-	ipnet       *net.IPNet
-	adapter     string
-	isSourceIP  bool
-	noResolveIP bool
-	isWithPort  bool
-	port        string
+	ipnet             *net.IPNet
+	adapter           string
+	isSourceIP        bool
+	noResolveIP       bool
+	isWithPort        bool
+	port              string
+	multiDomainDialip bool
 }
 
 func (i *IPCIDR) RuleType() C.RuleType {
@@ -73,15 +74,20 @@ func (i *IPCIDR) ShouldResolveIP() bool {
 	return !i.noResolveIP
 }
 
-func NewIPCIDR(s string, adapter string, opts ...IPCIDROption) (*IPCIDR, error) {
+func (d *IPCIDR) MultiDomainDialIP() bool {
+	return d.multiDomainDialip
+}
+
+func NewIPCIDR(s string, adapter string, multiDomainDialip bool, opts ...IPCIDROption) (*IPCIDR, error) {
 	_, ipnet, err := net.ParseCIDR(s)
 	if err != nil {
 		return nil, errPayload
 	}
 
 	ipcidr := &IPCIDR{
-		ipnet:   ipnet,
-		adapter: adapter,
+		ipnet:             ipnet,
+		adapter:           adapter,
+		multiDomainDialip: multiDomainDialip,
 	}
 
 	for _, o := range opts {

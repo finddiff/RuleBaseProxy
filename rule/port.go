@@ -7,9 +7,10 @@ import (
 )
 
 type Port struct {
-	adapter  string
-	port     string
-	isSource bool
+	adapter           string
+	port              string
+	isSource          bool
+	multiDomainDialip bool
 }
 
 func (p *Port) RuleType() C.RuleType {
@@ -38,14 +39,19 @@ func (p *Port) ShouldResolveIP() bool {
 	return false
 }
 
-func NewPort(port string, adapter string, isSource bool) (*Port, error) {
+func (d *Port) MultiDomainDialIP() bool {
+	return d.multiDomainDialip
+}
+
+func NewPort(port string, adapter string, isSource bool, multiDomainDialip bool) (*Port, error) {
 	_, err := strconv.Atoi(port)
 	if err != nil {
 		return nil, errPayload
 	}
 	return &Port{
-		adapter:  adapter,
-		port:     port,
-		isSource: isSource,
+		adapter:           adapter,
+		port:              port,
+		isSource:          isSource,
+		multiDomainDialip: multiDomainDialip,
 	}, nil
 }

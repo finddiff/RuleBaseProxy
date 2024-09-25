@@ -64,4 +64,5 @@ type Rule interface {
 	Adapter() string
 	Payload() string
 	ShouldResolveIP() bool
+	MultiDomainDialIP() bool
 }

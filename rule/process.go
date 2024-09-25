@@ -14,8 +14,9 @@ import (
 var processCache = cache.NewLRUCache(cache.WithAge(2), cache.WithSize(64))
 
 type Process struct {
-	adapter string
-	process string
+	adapter           string
+	process           string
+	multiDomainDialip bool
 }
 
 func (ps *Process) RuleType() C.RuleType {
@@ -57,9 +58,14 @@ func (ps *Process) ShouldResolveIP() bool {
 	return false
 }
 
-func NewProcess(process string, adapter string) (*Process, error) {
+func (d *Process) MultiDomainDialIP() bool {
+	return d.multiDomainDialip
+}
+
+func NewProcess(process string, adapter string, multiDomainDialip bool) (*Process, error) {
 	return &Process{
-		adapter: adapter,
-		process: process,
+		adapter:           adapter,
+		process:           process,
+		multiDomainDialip: multiDomainDialip,
 	}, nil
 }
