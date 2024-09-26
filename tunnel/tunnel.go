@@ -341,26 +341,32 @@ func handleTCPConn(ctx C.ConnContext) {
 
 	org_DstIP := metadata.DstIP
 	org_AddrType := metadata.AddrType
-	MultiDomain := InSeIP(metadata.DstIP.String()) || InSeDomain(metadata.Host)
+	//MultiDomain := InSeIP(metadata.DstIP.String()) || InSeDomain(metadata.Host)
 	if rule != nil && rule.MultiDomainDialIP() {
-		log.Debugln("tunnel handleTCPConn DstAddr %s:%s, infokey:%s, AddrType:%v, MultiDomain:%v", metadata.DstAddr(), metadata.DstPort, metadata.InfoKey(), metadata.AddrType, MultiDomain)
+		log.Debugln("tunnel handleTCPConn DstAddr %s:%s, infokey:%s, AddrType:%v, MultiDomain:%v", metadata.DstAddr(), metadata.DstPort, metadata.InfoKey(), metadata.AddrType)
 		if !(metadata.Type.String() == "HTTP" || metadata.Type.String() == "HTTP Connect" || metadata.Type.String() == "Socks4" || metadata.Type.String() == "Socks5") {
-			if MultiDomain {
-				if metadata.DstIP.To4() != nil {
-					metadata.AddrType = C.AtypIPv4
-				} else {
-					metadata.AddrType = C.AtypIPv6
-				}
-				log.Debugln("tunnel handleTCPConn dial by ip infokey:%s", metadata.InfoKey())
+			if metadata.DstIP.To4() != nil {
+				metadata.AddrType = C.AtypIPv4
 			} else {
-				if metadata.Host != "" {
-					metadata.AddrType = C.AtypDomainName
-					//metadata.DstIP = nil
-					log.Debugln("tunnel handleTCPConn dial by domain infokey:%s", metadata.InfoKey())
-				} else {
-					log.Debugln("tunnel handleTCPConn dial by defaule infokey:%s", metadata.InfoKey())
-				}
+				metadata.AddrType = C.AtypIPv6
 			}
+
+			//if MultiDomain {
+			//	if metadata.DstIP.To4() != nil {
+			//		metadata.AddrType = C.AtypIPv4
+			//	} else {
+			//		metadata.AddrType = C.AtypIPv6
+			//	}
+			//	log.Debugln("tunnel handleTCPConn dial by ip infokey:%s", metadata.InfoKey())
+			//} else {
+			//	if metadata.Host != "" {
+			//		metadata.AddrType = C.AtypDomainName
+			//		//metadata.DstIP = nil
+			//		log.Debugln("tunnel handleTCPConn dial by domain infokey:%s", metadata.InfoKey())
+			//	} else {
+			//		log.Debugln("tunnel handleTCPConn dial by defaule infokey:%s", metadata.InfoKey())
+			//	}
+			//}
 		}
 	}
 
@@ -398,11 +404,13 @@ func handleTCPConn(ctx C.ConnContext) {
 
 	//前台显示是通过ip连接还是通过域名连接
 	//tcpTrack.Chain = append(remoteConn.Chains(), Dial_type)
-	if MultiDomain {
-		tcpTrack.Chain = append(remoteConn.Chains(), "MultiDomain", Dial_type)
-	} else {
-		tcpTrack.Chain = remoteConn.Chains()
-	}
+	//if MultiDomain {
+	//	tcpTrack.Chain = append(remoteConn.Chains(), "MultiDomain", Dial_type)
+	//} else {
+	//	tcpTrack.Chain = append(remoteConn.Chains(), Dial_type)
+	//}
+
+	tcpTrack.Chain = append(remoteConn.Chains(), Dial_type)
 	remoteConn = tcpTrack
 	//statistic.DefaultManager.Join(tcpTrack)
 	//remoteConn = statistic.NewTCPTracker(remoteConn, statistic.DefaultManager, metadata, rule)

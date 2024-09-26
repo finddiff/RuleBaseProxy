@@ -1,7 +1,6 @@
 package tunnel
 
 import (
-	"fmt"
 	C "github.com/finddiff/RuleBaseProxy/constant"
 	"github.com/finddiff/RuleBaseProxy/log"
 	"github.com/finddiff/RuleBaseProxy/tunnel/statistic"
@@ -15,7 +14,7 @@ import (
 )
 
 var (
-	Cm, _           = lru.New[string, any](1024 * 1024)
+	Cm, _           = lru.New[string, any](1024 * 1024 * 4)
 	Dm, _           = lru.New[string, string](1024 * 1024)
 	Dm_se, _        = lru.New[string, string](1024 * 1024)
 	Dm_se_domain, _ = lru.New[string, string](1024 * 1024)
@@ -120,52 +119,43 @@ func GetnatPC(key string) C.PacketConn {
 }
 
 func matchHashMap(metadata *C.Metadata) (adapter C.Proxy, hashRule C.Rule, err error) {
-	domainStr := fmt.Sprintf("%v:%v %v %v", metadata, metadata.DstPort, metadata.SrcIP, metadata.NetWork)
+	infoKey := metadata.InfoKey()
 
-	log.Debugln("matchHashMap Cm.Get(domainStr) domainStr=%s", domainStr)
-	if hashValue, ok := Cm.Get(domainStr); ok && hashValue != nil {
-		//hashValue := item.Value()
-		//hashValue := item
+	if hashValue, ok := Cm.Get(infoKey + "_rule"); ok && hashValue != nil {
 		switch hashValue.(type) {
 		case C.Rule:
 			hashRule := hashValue.(C.Rule)
 			adapter, ok := proxies[hashValue.(C.Rule).Adapter()]
 			if hashRule.Match(metadata) && ok {
 				if metadata.NetWork == C.TCP {
-					log.Debugln("matchHashMap match domainStr=%s adapter=%v, hashRule=%v, err=%v ", domainStr, adapter, hashRule, err)
+					log.Debugln("matchHashMap match Rule=%s by key:%s", hashRule.RuleType().String(), infoKey)
 					return adapter, hashRule, nil
 				}
 				if metadata.NetWork == C.UDP && adapter.SupportUDP() {
-					log.Debugln("matchHashMap match domainStr=%s adapter=%v, hashRule=%v, err=%v ", domainStr, adapter, hashRule, err)
+					log.Debugln("matchHashMap match Rule=%s by key:%s", hashRule.RuleType().String(), infoKey)
 					return adapter, hashRule, nil
 				}
 			}
 		}
 	}
 
-	proxyStr := fmt.Sprintf("%v:%v %v %v %v", metadata, metadata.DstPort, metadata.SrcIP, metadata.SrcPort, metadata.NetWork)
-	log.Debugln("matchHashMap Cm.Get(proxyStr) proxyStr=%s", proxyStr)
-	if hashValue, ok := Cm.Get(proxyStr); ok && hashValue != nil {
-		//hashValue := item.Value()
-		//hashValue := item
+	if hashValue, ok := Cm.Get(infoKey + "_proxy"); ok && hashValue != nil {
+		proxy := hashValue.(C.Proxy)
 		switch hashValue.(type) {
 		case C.Proxy:
-			log.Debugln("matchHashMap match proxyStr=%s adapter=%v, hashRule=%v, err=%v ", proxyStr, adapter, hashRule, err)
-			return hashValue.(C.Proxy), nil, nil
-			//if proxy, ok := proxies[hashValue.(string)]; ok {
-			//	return proxy, nil, nil
-			//}
+			log.Debugln("matchHashMap match Proxy=%s by key:%s", proxy.Name(), infoKey)
+			return proxy, nil, nil
 		}
 	}
 
-	log.Debugln("matchHashMap match(metadata) metadata=%v", metadata)
+	log.Debugln("matchHashMap match(metadata) infoKey=%s", infoKey)
 	adapter, hashRule, err = match(metadata)
 	if hashRule != nil {
-		setMatchHashMap(domainStr, hashRule)
+		setMatchHashMap(infoKey+"_rule", hashRule)
 	} else {
-		setMatchHashMap(proxyStr, adapter)
+		setMatchHashMap(infoKey+"_proxy", adapter)
 	}
 
-	log.Debugln("last match domainStr=%s adapter=%v, hashRule=%v, err=%v ", domainStr, adapter, hashRule, err)
+	log.Debugln("last match infoKey=%s adapter=%v, hashRule=%v, err=%v ", infoKey, adapter, hashRule, err)
 	return
 }

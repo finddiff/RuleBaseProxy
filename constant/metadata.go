@@ -111,7 +111,7 @@ func (m *Metadata) String() string {
 }
 
 func (m *Metadata) InfoKey() string {
-	return fmt.Sprintf("%s %s %s %s %s %v", m.DstIP, m.DstPort, m.SrcIP.String(), m.Host, m.Type.String(), m.AddrType)
+	return fmt.Sprintf("%s->%s:%s host:%s Type:%s AddrType:%v NetWork:%v", m.SrcIP.String(), m.DstIP.String(), m.DstPort, m.Host, m.Type.String(), m.AddrType, m.NetWork)
 }
 
 func (m *Metadata) DstAddr() string {
