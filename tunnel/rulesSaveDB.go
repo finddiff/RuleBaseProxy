@@ -85,6 +85,7 @@ func LoadStrRule() []C.Rule {
 		}
 		return nil
 	})
+	//
 	for key, value := range needReSetKey {
 		AddStrRule(key, value)
 	}
