@@ -61,6 +61,22 @@ func withHosts(hosts *trie.DomainTrie, ipv6 bool) middleware {
 	}
 }
 
+func withADGurd() middleware {
+	return func(next handler) handler {
+		return func(ctx *context.DNSContext, r *D.Msg) (*D.Msg, error) {
+			q := r.Question[0]
+			host := strings.TrimRight(q.Name, ".")
+			log.Debugln("")
+			if ADGurdMatch(host) {
+				log.Debugln("%s ADGurdMatch block", host)
+				return r, nil
+			} else {
+				return next(ctx, r)
+			}
+		}
+	}
+}
+
 func withMapping(mapping *cache.LruCache) middleware {
 	return func(next handler) handler {
 		return func(ctx *context.DNSContext, r *D.Msg) (*D.Msg, error) {
@@ -237,6 +253,10 @@ func newHandler(resolver *Resolver, mapper *ResolverEnhancer) handler {
 
 	if resolver.hosts != nil {
 		middlewares = append(middlewares, withHosts(resolver.hosts, resolver.ipv6))
+	}
+
+	if len(ADGurdRules) > 0 {
+		middlewares = append(middlewares, withADGurd())
 	}
 
 	if mapper.mode == FAKEIP {

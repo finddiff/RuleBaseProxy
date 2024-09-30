@@ -73,6 +73,7 @@ type DNS struct {
 	FakeIPRange       *fakeip.Pool
 	Hosts             *trie.DomainTrie
 	NameServerPolicy  map[string]dns.NameServer
+	ADGuard           []string `yaml:"adguard-filter"`
 }
 
 // FallbackFilter config
@@ -117,6 +118,7 @@ type RawDNS struct {
 	FakeIPFilter      []string          `yaml:"fake-ip-filter"`
 	DefaultNameserver []string          `yaml:"default-nameserver"`
 	NameServerPolicy  map[string]string `yaml:"nameserver-policy"`
+	ADGuard           []string          `yaml:"adguard-filter"`
 }
 
 type RawFallbackFilter struct {
@@ -628,6 +630,10 @@ func parseDNS(cfg RawDNS, hosts *trie.DomainTrie) (*DNS, error) {
 
 	if cfg.UseHosts {
 		dnsCfg.Hosts = hosts
+	}
+
+	if len(cfg.ADGuard) > 0 {
+		dnsCfg.ADGuard = cfg.ADGuard
 	}
 
 	return dnsCfg, nil

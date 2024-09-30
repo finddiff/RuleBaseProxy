@@ -144,6 +144,12 @@ func updateDNS(c *config.DNS) {
 	resolver.DefaultResolver = r
 	resolver.DefaultHostMapper = m
 
+	dns.ADGurdRules = []C.Rule{}
+	dns.ADGurdCache.Purge()
+	for _, file := range c.ADGuard {
+		dns.AdgurdFile2Rule(file)
+	}
+
 	if err := dns.ReCreateServer(c.Listen, r, m); err != nil {
 		log.Errorln("Start DNS server error: %s", err.Error())
 		return

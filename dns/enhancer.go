@@ -1,11 +1,36 @@
 package dns
 
 import (
+	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/hashicorp/golang-lru/v2"
 	"net"
 
 	"github.com/finddiff/RuleBaseProxy/common/cache"
 	"github.com/finddiff/RuleBaseProxy/component/fakeip"
 )
+
+var (
+	ADGurdRules    []C.Rule
+	ADGurdCache, _ = lru.New[string, bool](1024 * 1024 * 4)
+)
+
+func ADGurdMatch(domain string) bool {
+	if value, ok := ADGurdCache.Get(domain); ok {
+		return value
+	}
+	for _, rule := range ADGurdRules {
+		if rule.Match(&C.Metadata{
+			AddrType: C.AtypDomainName,
+			Host:     domain,
+		}) {
+			ADGurdCache.Add(domain, true)
+			return true
+		}
+	}
+	ADGurdCache.Add(domain, false)
+
+	return false
+}
 
 type ResolverEnhancer struct {
 	mode     EnhancedMode
