@@ -60,6 +60,7 @@ func LoadStrRule() []C.Rule {
 			value := string(entry.Value)
 			strlist := TrimArr(strings.Split(value, ","))
 			if len(strlist) != 3 {
+				deleteKey = append(deleteKey, key)
 				log.Debugln("LoadStrRule err %s len(strlist) != 3", value)
 				continue
 			}
@@ -85,10 +86,11 @@ func LoadStrRule() []C.Rule {
 		}
 		return nil
 	})
-	//
+	//出现错误key 的时候进行修复，统一使用 rule.RuleType().String()+rule.Payload() 做为key；重新存入数据库
 	for key, value := range needReSetKey {
 		AddStrRule(key, value)
 	}
+	//删除错误的key
 	for _, key := range deleteKey {
 		DeleteStrRule(key)
 	}
