@@ -18,6 +18,16 @@ import (
 type handler func(ctx *context.DNSContext, r *D.Msg) (*D.Msg, error)
 type middleware func(next handler) handler
 
+func withPreHandle() middleware {
+	return func(next handler) handler {
+		return func(ctx *context.DNSContext, r *D.Msg) (*D.Msg, error) {
+			q := r.Question[0]
+			ctx.Host = strings.TrimRight(q.Name, ".")
+			return next(ctx, r)
+		}
+	}
+}
+
 func withHosts(hosts *trie.DomainTrie, ipv6 bool) middleware {
 	return func(next handler) handler {
 		return func(ctx *context.DNSContext, r *D.Msg) (*D.Msg, error) {
@@ -64,11 +74,10 @@ func withHosts(hosts *trie.DomainTrie, ipv6 bool) middleware {
 func withADGurd() middleware {
 	return func(next handler) handler {
 		return func(ctx *context.DNSContext, r *D.Msg) (*D.Msg, error) {
-			q := r.Question[0]
-			host := strings.TrimRight(q.Name, ".")
-			log.Debugln("")
-			if ADGurdMatch(host) {
-				log.Debugln("%s ADGurdMatch block", host)
+			//q := r.Question[0]
+			//host := strings.TrimRight(q.Name, ".")
+			if ADGurdMatch(ctx.Host) {
+				log.Debugln("%s ADGurdMatch block", ctx.Host)
 				return r, nil
 			} else {
 				return next(ctx, r)
@@ -91,7 +100,7 @@ func withMapping(mapping *cache.LruCache) middleware {
 				return nil, err
 			}
 
-			host := strings.TrimRight(q.Name, ".")
+			//host := strings.TrimRight(q.Name, ".")
 			all_eq := false
 
 			if C.FilterCacheIP {
@@ -162,10 +171,10 @@ func withMapping(mapping *cache.LruCache) middleware {
 					continue
 				}
 
-				mapping.SetWithExpire(ip.String(), host, time.Now().Add(time.Second*time.Duration(ttl)))
+				mapping.SetWithExpire(ip.String(), ctx.Host, time.Now().Add(time.Second*time.Duration(ttl)))
 				DnsMapAdd(DnsMap{
 					ipstr:  ip.String(),
-					domain: host,
+					domain: ctx.Host,
 					ttl:    ttl,
 					raddr:  ctx.RemoteAddr(),
 				})
@@ -181,8 +190,8 @@ func withFakeIP(fakePool *fakeip.Pool) middleware {
 		return func(ctx *context.DNSContext, r *D.Msg) (*D.Msg, error) {
 			q := r.Question[0]
 
-			host := strings.TrimRight(q.Name, ".")
-			if fakePool.LookupHost(host) {
+			//host := strings.TrimRight(q.Name, ".")
+			if fakePool.LookupHost(ctx.Host) {
 				return next(ctx, r)
 			}
 
@@ -197,7 +206,7 @@ func withFakeIP(fakePool *fakeip.Pool) middleware {
 
 			rr := &D.A{}
 			rr.Hdr = D.RR_Header{Name: q.Name, Rrtype: D.TypeA, Class: D.ClassINET, Ttl: dnsDefaultTTL}
-			ip := fakePool.Lookup(host)
+			ip := fakePool.Lookup(ctx.Host)
 			rr.A = ip
 			msg := r.Copy()
 			msg.Answer = []D.RR{rr}
@@ -249,7 +258,7 @@ func compose(middlewares []middleware, endpoint handler) handler {
 }
 
 func newHandler(resolver *Resolver, mapper *ResolverEnhancer) handler {
-	middlewares := []middleware{}
+	middlewares := []middleware{withPreHandle()}
 
 	if resolver.hosts != nil {
 		middlewares = append(middlewares, withHosts(resolver.hosts, resolver.ipv6))

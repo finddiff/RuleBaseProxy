@@ -17,6 +17,7 @@ type DNSContext struct {
 	msg   *dns.Msg
 	tp    string
 	raddr net.Addr
+	Host  string
 }
 
 func NewDNSContext(msg *dns.Msg, raddr net.Addr) *DNSContext {
