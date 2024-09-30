@@ -99,7 +99,7 @@ func updateHashMap(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db_key := req.Type + req.Key
+	db_key := req.Type + payload
 
 	if req.Value == "DELETE" {
 		payload = newRule.Payload()

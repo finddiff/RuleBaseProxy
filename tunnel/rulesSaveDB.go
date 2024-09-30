@@ -25,7 +25,7 @@ func AddStrRule(key string, value string) {
 		log.Debugln("AddStrRule add new to maps key:%v value:%v", key, value)
 		err := tx.Put(MapStringRule, []byte(key), []byte(value), 0)
 		if err != nil {
-			log.Errorln("tx.Put(MapDomainRule, []byte(key), []byte(value), 0) %v", err)
+			log.Errorln("tx.Put(MapStringRule, []byte(key), []byte(value), 0) %v", err)
 		}
 		return nil
 	})
@@ -40,7 +40,7 @@ func DeleteStrRule(key string) {
 		log.Infoln("DeleteStrRule key:%v", key)
 		err := tx.Delete(MapStringRule, []byte(key))
 		if err != nil {
-			log.Errorln("tx.Delete(MapDomainRule, []byte(key)) %v", err)
+			log.Errorln("tx.Delete(MapStringRule, []byte(key)) %v", err)
 		}
 		return nil
 	})
@@ -51,10 +51,12 @@ func DeleteStrRule(key string) {
 
 func LoadStrRule() []C.Rule {
 	rules = []C.Rule{}
+	needReSetKey := map[string]string{}
+	deleteKey := []string{}
 	err := Persistence.RuleDB.View(func(tx *nutsdb.Tx) error {
 		entries, _ := tx.GetAll(MapStringRule)
 		for _, entry := range entries {
-			//key := string(entry.Key)
+			key := string(entry.Key)
 			value := string(entry.Value)
 			strlist := TrimArr(strings.Split(value, ","))
 			if len(strlist) != 3 {
@@ -74,10 +76,21 @@ func LoadStrRule() []C.Rule {
 				continue
 			}
 			log.Infoln("LoadStrRule add rule：%v", rule)
+			if key != rule.RuleType().String()+rule.Payload() {
+				log.Infoln("LoadStrRule key not match key:%s, value:%s", key, value)
+				deleteKey = append(deleteKey, key)
+				needReSetKey[rule.RuleType().String()+rule.Payload()] = value
+			}
 			rules = append(rules, rule)
 		}
 		return nil
 	})
+	for key, value := range needReSetKey {
+		AddStrRule(key, value)
+	}
+	for _, key := range deleteKey {
+		DeleteStrRule(key)
+	}
 	if err != nil {
 		log.Errorln("db.Update(func(tx *nutsdb.Tx) error %v", err)
 	}
