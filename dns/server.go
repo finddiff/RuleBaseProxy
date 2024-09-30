@@ -68,6 +68,9 @@ func AdgurdFile2Rule(file string) {
 				break //文件读完了,退出for
 			}
 			line := buf.Text() //获取每一行
+			if strings.Contains(line, "@@||") {
+				continue
+			}
 
 			if st := re.FindString(line); st != "" {
 				st = strings.Replace(st, "||", "", -1)
