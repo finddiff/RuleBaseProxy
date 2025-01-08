@@ -51,7 +51,7 @@ func withHosts(hosts *trie.DomainTrie, ipv6 bool) middleware {
 				rr.A = v4
 
 				msg.Answer = []D.RR{rr}
-			} else if v6 := ip.To16(); ipv6 && v6 != nil && q.Qtype == D.TypeAAAA {
+			} else if v6 := ip.To16(); v4 == nil && ipv6 && v6 != nil && q.Qtype == D.TypeAAAA {
 				rr := &D.AAAA{}
 				rr.Hdr = D.RR_Header{Name: q.Name, Rrtype: D.TypeAAAA, Class: D.ClassINET, Ttl: dnsDefaultTTL}
 				rr.AAAA = v6
@@ -77,7 +77,7 @@ func withADGurd() middleware {
 			//q := r.Question[0]
 			//host := strings.TrimRight(q.Name, ".")
 			if ADGurdMatch(ctx.Host) {
-				log.Debugln("%s ADGurdMatch block", ctx.Host)
+				log.Debugln("%s from %s ADGurdMatch block", ctx.Host, ctx.RemoteAddr().String())
 				return r, nil
 			} else {
 				return next(ctx, r)

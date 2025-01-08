@@ -339,6 +339,11 @@ func handleTCPConn(ctx C.ConnContext) {
 		return
 	}
 
+	if rule != nil {
+		tcpTrack.TrackerInfo().Rule = rule.RuleType().String()
+		tcpTrack.TrackerInfo().RulePayload = rule.Payload()
+	}
+
 	org_DstIP := metadata.DstIP
 	org_AddrType := metadata.AddrType
 	//MultiDomain := InSeIP(metadata.DstIP.String()) || InSeDomain(metadata.Host)

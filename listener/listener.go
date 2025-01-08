@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/finddiff/RuleBaseProxy/listener/tun"
 	"github.com/finddiff/RuleBaseProxy/listener/tun/forward"
+	"golang.org/x/net/proxy"
 	"net"
 	"strconv"
 	"sync"
@@ -68,15 +69,16 @@ func PreCmd(cmd string) error {
 	return tun.ExecCommand(cmd)
 }
 
-func CreateLocalSockProxy(port int) {
-	//C.SockProxy = outbound.NewSocks5(outbound.Socks5Option{
-	//	Name:     "LOCAL_SOCK_PROXY",
-	//	Server:   "LOCLA_CLASH",
-	//	Port:     port,
-	//	UDP:      true,
-	//	UserName: C.UserName,
-	//	Password: C.UserPass,
-	//})
+func CreateLocalSockProxy(addr, username, passwd string) {
+	if len(username) > 1 {
+		if dialer, err := proxy.SOCKS5("tcp", addr, nil, nil); err == nil {
+			C.SockDialer = dialer
+		}
+	} else {
+		if dialer, err := proxy.SOCKS5("tcp", addr, &proxy.Auth{User: username, Password: passwd}, nil); err == nil {
+			C.SockDialer = dialer
+		}
+	}
 }
 
 func ReCreateHTTP(port int, tcpIn chan<- C.ConnContext) error {
@@ -103,7 +105,12 @@ func ReCreateHTTP(port int, tcpIn chan<- C.ConnContext) error {
 		return err
 	}
 
-	C.DnsProxyString = "http://127.0.0.1:" + strconv.Itoa(port)
+	if len(C.UserName) > 1 {
+		C.DnsProxyString = "http://" + C.UserName + ":" + C.UserPass + "@127.0.0.1:" + strconv.Itoa(port)
+	} else {
+		C.DnsProxyString = "http://127.0.0.1:" + strconv.Itoa(port)
+	}
+
 	log.Infoln("HTTP proxy listening at: %s", httpListener.Address())
 	return nil
 }
@@ -158,7 +165,7 @@ func ReCreateSocks(port int, tcpIn chan<- C.ConnContext, udpIn chan<- *inbound.P
 	socksUDPListener = udpListener
 
 	C.TunProxyString = "socks5://127.0.0.1:" + strconv.Itoa(port)
-	CreateLocalSockProxy(port)
+	CreateLocalSockProxy(C.TunProxyString, C.UserName, C.UserPass)
 	log.Infoln("SOCKS proxy listening at: %s", socksListener.Address())
 	return nil
 }
@@ -292,9 +299,14 @@ func ReCreateMixed(port int, tcpIn chan<- C.ConnContext, udpIn chan<- *inbound.P
 		mixedListener.Close()
 		return err
 	}
-	C.DnsProxyString = "http://127.0.0.1:" + strconv.Itoa(port)
+
+	if len(C.UserName) > 1 {
+		C.DnsProxyString = "http://" + C.UserName + ":" + C.UserPass + "@127.0.0.1:" + strconv.Itoa(port)
+	} else {
+		C.DnsProxyString = "http://127.0.0.1:" + strconv.Itoa(port)
+	}
 	C.TunProxyString = "socks5://127.0.0.1:" + strconv.Itoa(port)
-	CreateLocalSockProxy(port)
+	CreateLocalSockProxy(C.TunProxyString, C.UserName, C.UserPass)
 	log.Infoln("Mixed(http+socks) proxy listening at: %s", mixedListener.Address())
 	return nil
 }

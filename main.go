@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/finddiff/RuleBaseProxy/Persistence"
 	"go.uber.org/automaxprocs/maxprocs"
+	"net/http"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -16,12 +17,14 @@ import (
 	"github.com/finddiff/RuleBaseProxy/hub"
 	"github.com/finddiff/RuleBaseProxy/hub/executor"
 	"github.com/finddiff/RuleBaseProxy/log"
+	_ "net/http/pprof"
 )
 
 var (
 	flagset            map[string]bool
 	version            bool
 	testConfig         bool
+	testPprof          bool
 	homeDir            string
 	configFile         string
 	externalUI         string
@@ -40,6 +43,7 @@ func init() {
 	flag.BoolVar(&version, "version", false, "show current version of clash")
 	flag.BoolVar(&testConfig, "t", false, "test configuration and exit")
 	flag.BoolVar(&mergeDb, "dm", false, "merger nustdb and exit")
+	flag.BoolVar(&testPprof, "pprof", false, "start pprof at port 59999")
 
 	flag.Parse()
 
@@ -92,6 +96,12 @@ func main() {
 		Persistence.MergeDB()
 		Persistence.MergeRuleDB()
 		return
+	}
+
+	if testPprof {
+		go func() {
+			http.ListenAndServe("0.0.0.0:59999", nil)
+		}()
 	}
 
 	Persistence.InitDB()

@@ -1,5 +1,7 @@
 package constant
 
+import "golang.org/x/net/proxy"
+
 var (
 	DnsProxyString = ""
 	TunProxyString = ""
@@ -7,4 +9,5 @@ var (
 	UserPass       = ""
 	FilterCacheIP  = false
 	//SockProxy      *outbound.Socks5
+	SockDialer proxy.Dialer = nil
 )
