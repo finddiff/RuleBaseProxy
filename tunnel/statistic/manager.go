@@ -107,20 +107,20 @@ func (m *Manager) handle() {
 		//m.downloadTemp.Store(0)
 
 		allTempUpload := int64(0)
-		upload := int64(0)
+		//upload := int64(0)
 		allTemDownLoad := int64(0)
-		download := int64(0)
+		//download := int64(0)
 		m.connections.Range(func(key, value interface{}) bool {
 			tinfo := value.(tracker).TrackerInfo()
 			//upload = tinfo.UploadTotal.Load()
-			upload = tinfo.UploadTotal - tinfo.TempUpload
-			allTempUpload += upload
-			tinfo.TempUpload += upload
+			//upload = tinfo.UploadTotal - tinfo.TempUpload
+			allTempUpload += tinfo.UploadTotal - tinfo.TempUpload
+			tinfo.TempUpload = tinfo.UploadTotal
 
 			//download = tinfo.DownloadTotal.Load()
-			download = tinfo.DownloadTotal - tinfo.TempDownload
-			allTemDownLoad += download
-			tinfo.TempDownload += download
+			//download = tinfo.DownloadTotal - tinfo.TempDownload
+			allTemDownLoad += tinfo.DownloadTotal - tinfo.TempDownload
+			tinfo.TempDownload = tinfo.DownloadTotal
 			return true
 		})
 

@@ -348,7 +348,7 @@ func handleTCPConn(ctx C.ConnContext) {
 	org_AddrType := metadata.AddrType
 	//MultiDomain := InSeIP(metadata.DstIP.String()) || InSeDomain(metadata.Host)
 	if rule != nil && rule.MultiDomainDialIP() {
-		log.Debugln("tunnel handleTCPConn DstAddr %s:%s, infokey:%s, AddrType:%v, MultiDomain:%v", metadata.DstAddr(), metadata.DstPort, metadata.InfoKey(), metadata.AddrType)
+		log.Debugln("tunnel handleTCPConn DstAddr %s:%s, infokey:%s, AddrType:%v", metadata.DstAddr(), metadata.DstPort, metadata.InfoKey(), metadata.AddrType)
 		if !(metadata.Type.String() == "HTTP" || metadata.Type.String() == "HTTP Connect" || metadata.Type.String() == "Socks4" || metadata.Type.String() == "Socks5") {
 			if metadata.DstIP.To4() != nil {
 				metadata.AddrType = C.AtypIPv4
