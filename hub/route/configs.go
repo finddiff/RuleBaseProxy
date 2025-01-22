@@ -3,6 +3,7 @@ package route
 import (
 	"net/http"
 	"path/filepath"
+	"runtime/debug"
 
 	"github.com/finddiff/RuleBaseProxy/component/resolver"
 	"github.com/finddiff/RuleBaseProxy/config"
@@ -38,6 +39,8 @@ type configSchema struct {
 	TunDevice   string             `json:"tun-device"`
 	TUNPreUp    []string           `json:"tun-preup"`
 	TUNPostUp   []string           `json:"tun-postup"`
+	MemoryLimit *int64             `json:"memoryLimit"`
+	Gogc        *int               `json:"gogc"`
 }
 
 func getConfigs(w http.ResponseWriter, r *http.Request) {
@@ -79,7 +82,7 @@ func patchConfigs(w http.ResponseWriter, r *http.Request) {
 	P.ReCreateRedir(pointerOrDefault(general.RedirPort, ports.RedirPort), tcpIn, udpIn)
 	P.ReCreateTProxy(pointerOrDefault(general.TProxyPort, ports.TProxyPort), tcpIn, udpIn)
 	P.ReCreateMixed(pointerOrDefault(general.MixedPort, ports.MixedPort), tcpIn, udpIn)
-	P.ReCreateTun(general.TunDevice, general.TUNPreUp, general.TUNPostUp, tcpIn, udpIn)
+	//P.ReCreateTun(general.TunDevice, general.TUNPreUp, general.TUNPostUp, tcpIn, udpIn)
 
 	if general.Mode != nil {
 		tunnel.SetMode(*general.Mode)
@@ -91,6 +94,16 @@ func patchConfigs(w http.ResponseWriter, r *http.Request) {
 
 	if general.IPv6 != nil {
 		resolver.DisableIPv6 = !*general.IPv6
+	}
+
+	if general.MemoryLimit != nil && *general.MemoryLimit >= 200 && *general.MemoryLimit <= 8192 {
+		// 设置内存限制，最少为300m, 最大为4G
+		debug.SetMemoryLimit(*general.MemoryLimit * 1024 * 1024)
+	}
+
+	if general.Gogc != nil && *general.Gogc >= 10 && *general.Gogc <= 1000 {
+		// NextGC = LiveData * (1 + GOGC / 100) 动态调整 下次GC比例，最小为 10% 最大为 1000%
+		debug.SetGCPercent(*general.Gogc)
 	}
 
 	render.NoContent(w, r)
