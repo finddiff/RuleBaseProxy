@@ -72,6 +72,7 @@ func Start(addr string, secret string) {
 		r.Mount("/providers/proxies", proxyProviderRouter())
 
 		r.Mount("/hashmap", hashMapRouter())
+		r.Mount("/dhcp", dhcpRouter())
 	})
 
 	if uiPath != "" {

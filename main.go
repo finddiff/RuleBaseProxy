@@ -7,9 +7,11 @@ import (
 	"go.uber.org/automaxprocs/maxprocs"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"syscall"
 
 	"github.com/finddiff/RuleBaseProxy/config"
@@ -30,8 +32,8 @@ var (
 	externalUI         string
 	externalController string
 	secret             string
-
-	mergeDb bool
+	testCmd            bool
+	mergeDb            bool
 )
 
 func init() {
@@ -44,6 +46,7 @@ func init() {
 	flag.BoolVar(&testConfig, "t", false, "test configuration and exit")
 	flag.BoolVar(&mergeDb, "dm", false, "merger nustdb and exit")
 	flag.BoolVar(&testPprof, "pprof", false, "start pprof at port 59999")
+	flag.BoolVar(&testCmd, "cmd", false, "test cmd sudo ip -6 neighbour show")
 
 	flag.Parse()
 
@@ -56,6 +59,29 @@ func init() {
 func main() {
 	if version {
 		fmt.Printf("Clash %s %s %s with %s %s runtime.NumCPU():%d\n", C.Version, runtime.GOOS, runtime.GOARCH, runtime.Version(), C.BuildTime, runtime.NumCPU())
+		return
+	}
+
+	if testCmd {
+		cmd := exec.Command("sudo", "ip", "-6", "neighbour", "show")
+
+		// 执行命令并获取标准输出和标准错误的组合输出
+		output, err := cmd.CombinedOutput()
+		if err != nil {
+			fmt.Println("执行命令失败: ", err)
+		}
+
+		for _, line := range strings.Split(string(output), "\n") {
+			items := strings.Split(line, " ")
+			fmt.Println("items: ", len(items))
+			if len(items) != 7 {
+				continue
+			}
+			fmt.Printf("ipv6: %s , mac:%s \n", items[0], items[4])
+		}
+
+		// 将输出以字符串形式打印出来
+		fmt.Println(string(output))
 		return
 	}
 
