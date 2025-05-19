@@ -140,8 +140,6 @@ func preHandleMetadata(metadata *C.Metadata) error {
 		}
 	}
 
-	//log.Infoln("preHandleMetadata after ParseIP infokey:%s", metadata.InfoKey())
-
 	// preprocess enhanced-mode metadata
 	if needLookupIP(metadata) {
 		host, exist := resolver.FindHostByIP(metadata.DstIP)
@@ -150,13 +148,7 @@ func preHandleMetadata(metadata *C.Metadata) error {
 				exist = true
 				host = item
 			}
-
-			//if ok && item != nil {
-			//	exist = true
-			//	host = item.(string)
-			//}
 		}
-		//log.Debugln("preHandleMetadata after needLookupIP infokey:%s", metadata.InfoKey())
 
 		if exist {
 			metadata.Host = host
@@ -181,23 +173,6 @@ func preHandleMetadata(metadata *C.Metadata) error {
 
 	return nil
 }
-
-//
-//func afterHandleMetadata(metadata *C.Metadata) error {
-//	if resolver.FakeIPEnabled() {
-//		return nil
-//	}
-//	// handle IP string on host
-//	if metadata.DstIP != nil {
-//		if metadata.DstIP.To4() != nil {
-//			metadata.AddrType = C.AtypIPv4
-//		} else {
-//			metadata.AddrType = C.AtypIPv6
-//		}
-//	}
-//
-//	return nil
-//}
 
 func resolveMetadata(ctx C.PlainContext, metadata *C.Metadata) (proxy C.Proxy, rule C.Rule, err error) {
 	switch mode {
@@ -342,6 +317,9 @@ func handleTCPConn(ctx C.ConnContext) {
 	if rule != nil {
 		tcpTrack.TrackerInfo().Rule = rule.RuleType().String()
 		tcpTrack.TrackerInfo().RulePayload = rule.Payload()
+		tcpTrack.Chain = []string{rule.RuleType().String(), rule.Payload(), proxy.Name(), "DAIL", "ERROR"}
+	} else {
+		tcpTrack.Chain = []string{proxy.Name(), "DAIL", "ERROR"}
 	}
 
 	org_DstIP := metadata.DstIP
@@ -355,23 +333,6 @@ func handleTCPConn(ctx C.ConnContext) {
 			} else {
 				metadata.AddrType = C.AtypIPv6
 			}
-
-			//if MultiDomain {
-			//	if metadata.DstIP.To4() != nil {
-			//		metadata.AddrType = C.AtypIPv4
-			//	} else {
-			//		metadata.AddrType = C.AtypIPv6
-			//	}
-			//	log.Debugln("tunnel handleTCPConn dial by ip infokey:%s", metadata.InfoKey())
-			//} else {
-			//	if metadata.Host != "" {
-			//		metadata.AddrType = C.AtypDomainName
-			//		//metadata.DstIP = nil
-			//		log.Debugln("tunnel handleTCPConn dial by domain infokey:%s", metadata.InfoKey())
-			//	} else {
-			//		log.Debugln("tunnel handleTCPConn dial by defaule infokey:%s", metadata.InfoKey())
-			//	}
-			//}
 		}
 	}
 
@@ -384,7 +345,7 @@ func handleTCPConn(ctx C.ConnContext) {
 	}
 
 	log.Debugln("proxy(%v).Dial metadata NetWork:%v Type:%v SrcIP:%v DstIP:%v SrcPort:%v DstPort:%v AddrType:%v Host:%v", proxy.Name(), metadata.NetWork, metadata.Type, metadata.SrcIP, metadata.DstIP, metadata.SrcPort, metadata.DstPort, metadata.AddrType, metadata.Host)
-	tcpTrack.Chain = []string{"DAIL", "ERROR"}
+	//tcpTrack.Chain = []string{proxy.Name(), "DAIL", "ERROR"}
 	remoteConn, err := proxy.Dial(metadata)
 
 	metadata.AddrType = org_AddrType
@@ -393,10 +354,12 @@ func handleTCPConn(ctx C.ConnContext) {
 	if err != nil {
 		if rule == nil {
 			log.Warnln("[TCP] dial %s to %s error: %s", proxy.Name(), metadata.RemoteAddress(), err.Error())
+			tcpTrack.Chain = []string{proxy.Name(), err.Error(), "ERROR"}
 		} else {
 			log.Warnln("[TCP] dial %s (match %s/%s) to %s error: %s", proxy.Name(), rule.RuleType().String(), rule.Payload(), metadata.RemoteAddress(), err.Error())
+			tcpTrack.Chain = []string{proxy.Name(), rule.RuleType().String(), rule.Payload(), err.Error(), "ERROR"}
 		}
-		tcpTrack.Chain = []string{err.Error(), "ERROR", proxy.Name()}
+
 		if time.Now().Sub(tcpTrack.Start) < time.Duration(3)*time.Second {
 			time.Sleep(time.Duration(3) * time.Second)
 		}
@@ -404,21 +367,10 @@ func handleTCPConn(ctx C.ConnContext) {
 		//defer tcpTrack.Close()
 		return
 	}
-	tcpTrack.Chain = []string{"RECO", "ERROR"}
+
 	tcpTrack.Conn = remoteConn
-
-	//前台显示是通过ip连接还是通过域名连接
-	//tcpTrack.Chain = append(remoteConn.Chains(), Dial_type)
-	//if MultiDomain {
-	//	tcpTrack.Chain = append(remoteConn.Chains(), "MultiDomain", Dial_type)
-	//} else {
-	//	tcpTrack.Chain = append(remoteConn.Chains(), Dial_type)
-	//}
-
 	tcpTrack.Chain = append(remoteConn.Chains(), Dial_type)
 	remoteConn = tcpTrack
-	//statistic.DefaultManager.Join(tcpTrack)
-	//remoteConn = statistic.NewTCPTracker(remoteConn, statistic.DefaultManager, metadata, rule)
 	defer remoteConn.Close()
 
 	//log.Infoln("handleTCPConn after proxy.Dial infokey%s", metadata.InfoKey())
