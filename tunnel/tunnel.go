@@ -152,7 +152,9 @@ func preHandleMetadata(metadata *C.Metadata) error {
 
 		if exist {
 			metadata.Host = host
-			metadata.AddrType = C.AtypDomainName
+			if !(metadata.Type.String() == "HTTP" || metadata.Type.String() == "HTTP Connect" || metadata.Type.String() == "Socks4" || metadata.Type.String() == "Socks5") {
+				metadata.AddrType = C.AtypDomainName
+			}
 			if resolver.FakeIPEnabled() {
 				metadata.DstIP = nil
 				//log.Debugln("preHandleMetadata after resolver.FakeIPEnabled infokey:%s", metadata.InfoKey())

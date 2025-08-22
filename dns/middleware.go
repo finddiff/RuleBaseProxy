@@ -1,7 +1,7 @@
 package dns
 
 import (
-	C "github.com/finddiff/RuleBaseProxy/constant"
+	//C "github.com/finddiff/RuleBaseProxy/constant"
 	"net"
 	"strings"
 	"time"
@@ -103,54 +103,6 @@ func withMapping(mapping *cache.LruCache) middleware {
 			//host := strings.TrimRight(q.Name, ".")
 			all_eq := false
 
-			if C.FilterCacheIP {
-				// 透明代理模式，尽量保证一个ip 对应一个domain
-				//new_Answer := make([]D.RR, 0)
-				//pass_ip_count := 0
-				//last_domain := ""
-				//all_eq = true
-				//for _, ans := range msg.Answer { // 对于存在缓存中的ip进行过滤
-				//	var ip net.IP
-				//
-				//	switch a := ans.(type) {
-				//	case *D.A:
-				//		ip = a.A
-				//	case *D.AAAA:
-				//		ip = a.AAAA
-				//	default:
-				//		new_Answer = append(new_Answer, ans)
-				//		continue
-				//	}
-				//
-				//	if cache_domain, ok := mapping.Get(ip.String()); ok && cache_domain.(string) != host {
-				//		// 过滤掉已经使用的ip - domain 映射
-				//		if last_domain == "" {
-				//			last_domain = cache_domain.(string)
-				//		} else {
-				//			if last_domain != cache_domain {
-				//				all_eq = false
-				//			}
-				//		}
-				//
-				//		log.Debugln("FilterCacheIP ip:%s, host:%s, cache_domain:%s", ip.String(), host, cache_domain)
-				//	} else {
-				//		new_Answer = append(new_Answer, ans)
-				//		pass_ip_count += 1
-				//	}
-				//}
-				//
-				//if last_domain == "" {
-				//	all_eq = false
-				//}
-				//
-				////如果过滤后，没有可以的ip 那就不过滤了
-				//if pass_ip_count > 0 {
-				//	msg.Answer = new_Answer
-				//}
-				//
-				//log.Debugln("FilterCacheIP host:%s, all_eq:%v, pass_ip_count:%v", host, all_eq, pass_ip_count)
-			}
-
 			for _, ans := range msg.Answer {
 				var ip net.IP
 				var ttl uint32
@@ -167,11 +119,19 @@ func withMapping(mapping *cache.LruCache) middleware {
 				}
 
 				// 全部等价，就不用记录新值了
+				//if all_eq {
+				//	continue
+				//}
+				if host, ok := mapping.Get(ip.String()); ok && host.(string) == ctx.Host {
+					all_eq = true
+				}
+				mapping.SetWithExpire(ip.String(), ctx.Host, time.Now().Add(time.Second*time.Duration(ttl)))
+
 				if all_eq {
+					all_eq = false
 					continue
 				}
 
-				mapping.SetWithExpire(ip.String(), ctx.Host, time.Now().Add(time.Second*time.Duration(ttl)))
 				DnsMapAdd(DnsMap{
 					ipstr:  ip.String(),
 					domain: ctx.Host,
