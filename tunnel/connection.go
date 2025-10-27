@@ -105,10 +105,19 @@ func relay(leftConn, rightConn net.Conn) {
 	go func() {
 		// Wrapping to avoid using *net.TCPConn.(ReadFrom)
 		// See also https://github.com/Dreamacro/clash/pull/1209
+		defer func() {
+			close(ch)
+			leftConn.Close()
+		}()
 		_, err := io.Copy(WriteOnlyWriter{Writer: leftConn}, ReadOnlyReader{Reader: rightConn})
 		leftConn.SetReadDeadline(time.Now())
 		leftConn.Close()
 		ch <- err
+	}()
+
+	defer func() {
+		close(ch)
+		rightConn.Close()
 	}()
 
 	io.Copy(WriteOnlyWriter{Writer: rightConn}, ReadOnlyReader{Reader: leftConn})

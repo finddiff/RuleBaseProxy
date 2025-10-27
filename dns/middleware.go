@@ -122,8 +122,10 @@ func withMapping(mapping *cache.LruCache) middleware {
 				//if all_eq {
 				//	continue
 				//}
-				if host, ok := mapping.Get(ip.String()); ok && host.(string) == ctx.Host {
-					all_eq = true
+				if host, ok := mapping.Get(ip.String()); ok {
+					if host.(string) == ctx.Host {
+						all_eq = true
+					}
 				}
 				mapping.SetWithExpire(ip.String(), ctx.Host, time.Now().Add(time.Second*time.Duration(ttl)))
 

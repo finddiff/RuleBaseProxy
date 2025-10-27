@@ -5,9 +5,29 @@ import (
 	"time"
 
 	C "github.com/finddiff/RuleBaseProxy/constant"
-
+	"github.com/finddiff/RuleBaseProxy/log"
 	"github.com/gofrs/uuid"
 )
+
+// 添加流量单位转换函数
+func formatTraffic(bytes int64) (float64, string) {
+	const (
+		KB = 1024
+		MB = KB * 1024
+		GB = MB * 1024
+	)
+
+	switch {
+	case bytes >= GB:
+		return float64(bytes) / GB, "GB"
+	case bytes >= MB:
+		return float64(bytes) / MB, "MB"
+	case bytes >= KB:
+		return float64(bytes) / KB, "KB"
+	default:
+		return float64(bytes), "Byte"
+	}
+}
 
 type tracker interface {
 	ID() string
@@ -34,7 +54,8 @@ type trackerInfo struct {
 type tcpTracker struct {
 	C.Conn `json:"-"`
 	*trackerInfo
-	manager *Manager
+	manager    *Manager
+	firstClose bool
 }
 
 func (tt *tcpTracker) ID() string {
@@ -78,6 +99,16 @@ func (tt *tcpTracker) Close() error {
 		return nil
 	}
 	err := tt.Conn.Close()
+
+	// 使用新的流量单位转换函数
+	if tt.firstClose {
+		uploadVal, uploadUnit := formatTraffic(tt.UploadTotal)
+		downloadVal, downloadUnit := formatTraffic(tt.DownloadTotal)
+		log.Infoln("[TCP] %s --> %s close, upload: %.2f (%s), download: %.2f (%s)",
+			tt.Metadata.SourceAddress(), tt.Metadata.RemoteAddress(),
+			uploadVal, uploadUnit, downloadVal, downloadUnit)
+		tt.firstClose = false
+	}
 	return err
 }
 
@@ -109,6 +140,7 @@ func NewTCPTracker(conn C.Conn, manager *Manager, metadata *C.Metadata, rule C.R
 			TempDownload:  0,
 			MarkGC:        false,
 		},
+		firstClose: true,
 	}
 
 	if conn != nil {
@@ -134,7 +166,8 @@ func NewTCPTracker(conn C.Conn, manager *Manager, metadata *C.Metadata, rule C.R
 type udpTracker struct {
 	C.PacketConn `json:"-"`
 	*trackerInfo
-	manager *Manager
+	manager    *Manager
+	firstClose bool
 }
 
 func (ut *udpTracker) ID() string {
@@ -173,11 +206,20 @@ func (ut *udpTracker) Close() error {
 	}
 
 	ut.manager.Leave(ut)
-
 	if ut.PacketConn == nil {
 		return nil
 	}
 	err := ut.PacketConn.Close()
+
+	// 使用新的流量单位转换函数
+	if ut.firstClose {
+		uploadVal, uploadUnit := formatTraffic(ut.UploadTotal)
+		downloadVal, downloadUnit := formatTraffic(ut.DownloadTotal)
+		log.Infoln("[UDP] %s --> %s close, upload: %.2f (%s), download: %.2f (%s)",
+			ut.Metadata.SourceAddress(), ut.Metadata.RemoteAddress(),
+			uploadVal, uploadUnit, downloadVal, downloadUnit)
+		ut.firstClose = false
+	}
 	return err
 }
 
@@ -202,6 +244,7 @@ func NewUDPTracker(conn C.PacketConn, manager *Manager, metadata *C.Metadata, ru
 			TempDownload:  0,
 			MarkGC:        false,
 		},
+		firstClose: true,
 	}
 
 	if conn != nil {
