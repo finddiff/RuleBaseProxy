@@ -245,7 +245,10 @@ func dualQuery(resolver *Resolver, r *D.Msg) (msg *D.Msg, err error) {
 		// 如果都失败，返回第一个错误
 		finalMsg = aResult.msg
 	}
-
+	if finalMsg == nil {
+		log.Errorln("[DNS Server] Merged dualQuery failed: both A and AAAA queries failed")
+		return handleMsgWithEmptyAnswer(r), nil
+	}
 	finalMsg.SetRcode(r, finalMsg.Rcode)
 	finalMsg.Authoritative = true
 	finalMsg.RecursionAvailable = true
