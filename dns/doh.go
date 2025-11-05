@@ -27,6 +27,10 @@ type dohClient struct {
 	transport *http.Transport
 }
 
+func (dc *dohClient) String() string {
+	return dc.url
+}
+
 func (dc *dohClient) Exchange(m *D.Msg) (msg *D.Msg, err error) {
 	return dc.ExchangeContext(context.Background(), m)
 }

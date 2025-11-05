@@ -2,8 +2,7 @@ package proxy
 
 import (
 	"fmt"
-	"github.com/finddiff/RuleBaseProxy/listener/tun"
-	"github.com/finddiff/RuleBaseProxy/listener/tun/forward"
+	//"github.com/finddiff/RuleBaseProxy/listener/tun"
 	"golang.org/x/net/proxy"
 	"net"
 	"strconv"
@@ -66,7 +65,8 @@ func SetBindAddress(host string) {
 }
 
 func PreCmd(cmd string) error {
-	return tun.ExecCommand(cmd)
+	//return tun.ExecCommand(cmd)
+	return nil
 }
 
 func CreateLocalSockProxy(addr, username, passwd string) {
@@ -242,6 +242,7 @@ func ReCreateTProxy(port int, tcpIn chan<- C.ConnContext, udpIn chan<- *inbound.
 	var err error
 	tproxyListener, err = tproxy.New(addr, tcpIn)
 	if err != nil {
+		log.Errorln("Failed to start addr %s TProxy Listener: %s", addr, err)
 		return err
 	}
 
@@ -311,38 +312,38 @@ func ReCreateMixed(port int, tcpIn chan<- C.ConnContext, udpIn chan<- *inbound.P
 	return nil
 }
 
-func ReCreateTun(TunDevice string, TUNPreUp, TUNPostUp []string, tcpIn chan<- C.ConnContext, udpIn chan<- *inbound.PacketAdapter) error {
-	//tun.Insert()
-	//maxprocs.Set(maxprocs.Logger(func(string, ...any) {}))
-	if TunDevice == "" {
-		return nil
-	}
-
-	tun.Stop()
-	key := new(tun.Key)
-
-	key.Mark = 0
-	key.MTU = 0
-	key.UDPTimeout = 0
-	key.Device = TunDevice
-	key.Interface = ""
-	key.LogLevel = "debug"
-	key.RestAPI = ""
-	key.TCPSendBufferSize = ""
-	key.TCPReceiveBufferSize = ""
-	key.TCPModerateReceiveBuffer = true
-	key.TUNPreUp = TUNPreUp
-	key.TUNPostUp = TUNPostUp
-	key.Proxy = C.TunProxyString
-
-	log.Infoln("TunDevice:%s , TUNPreUp:%s, TUNPostUp:%s", TunDevice, TUNPreUp, TUNPostUp)
-
-	forward.TcpIn = tcpIn
-	forward.UdpIn = udpIn
-	tun.Insert(key)
-	tun.Start()
-	return nil
-}
+//func ReCreateTun(TunDevice string, TUNPreUp, TUNPostUp []string, tcpIn chan<- C.ConnContext, udpIn chan<- *inbound.PacketAdapter) error {
+//	//tun.Insert()
+//	//maxprocs.Set(maxprocs.Logger(func(string, ...any) {}))
+//	if TunDevice == "" {
+//		return nil
+//	}
+//
+//	tun.Stop()
+//	key := new(tun.Key)
+//
+//	key.Mark = 0
+//	key.MTU = 0
+//	key.UDPTimeout = 0
+//	key.Device = TunDevice
+//	key.Interface = ""
+//	key.LogLevel = "debug"
+//	key.RestAPI = ""
+//	key.TCPSendBufferSize = ""
+//	key.TCPReceiveBufferSize = ""
+//	key.TCPModerateReceiveBuffer = true
+//	key.TUNPreUp = TUNPreUp
+//	key.TUNPostUp = TUNPostUp
+//	key.Proxy = C.TunProxyString
+//
+//	log.Infoln("TunDevice:%s , TUNPreUp:%s, TUNPostUp:%s", TunDevice, TUNPreUp, TUNPostUp)
+//
+//	forward.TcpIn = tcpIn
+//	forward.UdpIn = udpIn
+//	tun.Insert(key)
+//	tun.Start()
+//	return nil
+//}
 
 // GetPorts return the ports of proxy servers
 func GetPorts() *Ports {

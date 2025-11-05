@@ -4,8 +4,11 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"slices"
 	"strconv"
 	"time"
+
+	"github.com/finddiff/RuleBaseProxy/tunnel/statistic"
 
 	"github.com/finddiff/RuleBaseProxy/adapter"
 	"github.com/finddiff/RuleBaseProxy/adapter/outboundgroup"
@@ -90,6 +93,13 @@ func updateProxy(w http.ResponseWriter, r *http.Request) {
 		render.Status(r, http.StatusBadRequest)
 		render.JSON(w, r, newError(fmt.Sprintf("Selector update error: %s", err.Error())))
 		return
+	}
+
+	snapshot := statistic.DefaultManager.Snapshot()
+	for _, c := range snapshot.Connections {
+		if slices.Contains(c.TrackerInfo().Chain, proxy.Name()) {
+			c.Close()
+		}
 	}
 
 	//tunnel.Cm.Clear()

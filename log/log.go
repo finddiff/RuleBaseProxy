@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	logCh  = make(chan interface{})
+	logCh  = make(chan interface{}, 300)
 	source = observable.NewObservable(logCh)
 	level  = INFO
 )
@@ -90,7 +90,12 @@ func print(data *Event) {
 		log.Debugln(data.Payload)
 	}
 
-	logCh <- data
+	select {
+	case logCh <- data:
+	default:
+		// 通道已满，可以选择记录一条警告日志
+		log.Warnln("log channel is full, dropping log event")
+	}
 }
 
 func newLog(logLevel LogLevel, format string, v ...interface{}) *Event {

@@ -1,11 +1,10 @@
 package tproxy
 
 import (
-	"net"
-
 	"github.com/finddiff/RuleBaseProxy/adapter/inbound"
 	C "github.com/finddiff/RuleBaseProxy/constant"
 	"github.com/finddiff/RuleBaseProxy/transport/socks5"
+	"net"
 )
 
 type Listener struct {
@@ -47,6 +46,7 @@ func New(addr string, in chan<- C.ConnContext) (*Listener, error) {
 	if err != nil {
 		return nil, err
 	}
+	//fmt.Println("tproxy listener tcp type:", reflect.TypeOf(rc).String()) *net.rawListener
 
 	err = setsockopt(rc, addr)
 	if err != nil {

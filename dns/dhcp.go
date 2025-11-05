@@ -33,6 +33,10 @@ type dhcpClient struct {
 	err       error
 }
 
+func (d *dhcpClient) String() string {
+	return d.ifaceName
+}
+
 func (d *dhcpClient) Exchange(m *D.Msg) (msg *D.Msg, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), resolver.DefaultDNSTimeout)
 	defer cancel()

@@ -388,7 +388,8 @@ func handleTCPConn(ctx C.ConnContext) {
 		log.Infoln("[TCP] %s --> %s doesn't match any rule using DIRECT", metadata.SourceAddress(), metadata.RemoteAddress())
 	}
 
-	handleSocket(ctx, remoteConn)
+	//handleSocket(ctx, remoteConn)
+	relay(ctx.Conn(), remoteConn)
 }
 
 func shouldResolveIP(rule C.Rule, metadata *C.Metadata) bool {

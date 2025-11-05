@@ -16,7 +16,6 @@ require (
 replace github.com/finddiff/RuleBaseProxy => ../
 
 require (
-	github.com/Dreamacro/go-shadowsocks2 v0.1.8 // indirect
 	github.com/Microsoft/go-winio v0.5.0 // indirect
 	github.com/containerd/containerd v1.5.5 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

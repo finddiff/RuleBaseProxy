@@ -1,12 +1,11 @@
 package tproxy
 
 import (
-	"net"
-
 	"github.com/finddiff/RuleBaseProxy/adapter/inbound"
 	"github.com/finddiff/RuleBaseProxy/common/pool"
 	C "github.com/finddiff/RuleBaseProxy/constant"
 	"github.com/finddiff/RuleBaseProxy/transport/socks5"
+	"net"
 )
 
 type UDPListener struct {
@@ -48,7 +47,7 @@ func NewUDP(addr string, in chan<- *inbound.PacketAdapter) (*UDPListener, error)
 	if err != nil {
 		return nil, err
 	}
-
+	//fmt.Println("tproxy listener udp type:", reflect.TypeOf(rc).String()) *net.rawConn
 	err = setsockopt(rc, addr)
 	if err != nil {
 		return nil, err

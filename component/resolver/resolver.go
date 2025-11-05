@@ -23,7 +23,7 @@ var (
 	DefaultHosts = trie.New()
 
 	// DefaultDNSTimeout defined the default dns request timeout
-	DefaultDNSTimeout = time.Second * 5
+	DefaultDNSTimeout = time.Second * 10
 )
 
 var (

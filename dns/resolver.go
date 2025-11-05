@@ -15,6 +15,7 @@ import (
 	"github.com/finddiff/RuleBaseProxy/component/resolver"
 	"github.com/finddiff/RuleBaseProxy/component/trie"
 
+	"github.com/finddiff/RuleBaseProxy/log"
 	D "github.com/miekg/dns"
 	"golang.org/x/sync/singleflight"
 )
@@ -22,6 +23,7 @@ import (
 type dnsClient interface {
 	Exchange(m *D.Msg) (msg *D.Msg, err error)
 	ExchangeContext(ctx context.Context, m *D.Msg) (msg *D.Msg, err error)
+	String() string
 }
 
 type result struct {
@@ -39,6 +41,11 @@ type Resolver struct {
 	group                 singleflight.Group
 	lruCache              *cache.LruCache
 	policy                *trie.DomainTrie
+}
+
+func (r *Resolver) String() string {
+	return fmt.Sprintf("Resolver{ipv6:%v, hosts:%v, main:%v, fallback:%v, fallbackDomainFilters:%v, fallbackIPFilters:%v, group:%v, lruCache:%v, policy:%v}",
+		r.ipv6, r.hosts, r.main, r.fallback, r.fallbackDomainFilters, r.fallbackIPFilters, r.group, r.lruCache, r.policy)
 }
 
 // ResolveIP request with TypeA and TypeAAAA, priority return TypeA
@@ -153,17 +160,27 @@ func (r *Resolver) exchangeWithoutCache(ctx context.Context, m *D.Msg) (msg *D.M
 }
 
 func (r *Resolver) batchExchange(ctx context.Context, clients []dnsClient, m *D.Msg) (msg *D.Msg, err error) {
+	//query_name := m.Question[0].Name
+	//log.Debugln("batchExchange query:%s", query_name)
+	//orgMsg := m.Copy()
+
 	fast, ctx := picker.WithTimeout(ctx, resolver.DefaultDNSTimeout)
 	for _, client := range clients {
+		//log.Debugln("ExchangeContext query name:%s client:%s", query_name, client.String())
 		r := client
+		// 创建消息的深拷贝，确保每个goroutine有独立的消息对象
+		msgCopy := m.Copy()
 		fast.Go(func() (interface{}, error) {
-			m, err := r.ExchangeContext(ctx, m)
+			// 使用本地副本而不是共享的m变量
+			//log.Debugln("ExchangeContext query name:%s client:%s type:%s query:%v err:%v send", msgCopy.Question[0].Name, r.String(), D.Type(msgCopy.Question[0].Qtype).String(), msgCopy, err)
+			result, err := r.ExchangeContext(ctx, msgCopy)
+			log.Debugln("ExchangeContext query name:%s client:%s query-type:%s answer:%v err:%v", msgCopy.Question[0].Name, r.String(), D.Type(msgCopy.Question[0].Qtype).String(), result, err)
 			if err != nil {
 				return nil, err
-			} else if m.Rcode == D.RcodeServerFailure || m.Rcode == D.RcodeRefused {
+			} else if result != nil && (result.Rcode == D.RcodeServerFailure || result.Rcode == D.RcodeRefused || result.Rcode == D.RcodeNameError) {
 				return nil, errors.New("server failure")
 			}
-			return m, nil
+			return result, nil
 		})
 	}
 
@@ -172,6 +189,7 @@ func (r *Resolver) batchExchange(ctx context.Context, clients []dnsClient, m *D.
 		err := errors.New("all DNS requests failed")
 		if fErr := fast.Error(); fErr != nil {
 			err = fmt.Errorf("%w, first error: %s", err, fErr.Error())
+			log.Debugln("ExchangeContext query-name:%s query-type:%s err:%v", m.Question[0].Name, D.Type(m.Question[0].Qtype).String(), err)
 		}
 		return nil, err
 	}

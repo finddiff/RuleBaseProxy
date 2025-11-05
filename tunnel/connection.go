@@ -86,9 +86,9 @@ type IdleTimeoutConn struct {
 	Timeout time.Duration
 }
 
-func handleSocket(ctx C.ConnContext, outbound net.Conn) {
-	relay(ctx.Conn(), outbound)
-}
+//func handleSocket(ctx C.ConnContext, outbound net.Conn) {
+//	relay(ctx.Conn(), outbound)
+//}
 
 type ReadOnlyReader struct {
 	io.Reader
@@ -105,25 +105,20 @@ func relay(leftConn, rightConn net.Conn) {
 	go func() {
 		// Wrapping to avoid using *net.TCPConn.(ReadFrom)
 		// See also https://github.com/Dreamacro/clash/pull/1209
-		defer func() {
-			close(ch)
-			leftConn.Close()
-		}()
 		_, err := io.Copy(WriteOnlyWriter{Writer: leftConn}, ReadOnlyReader{Reader: rightConn})
 		leftConn.SetReadDeadline(time.Now())
+		//defer func() {
 		leftConn.Close()
 		ch <- err
-	}()
-
-	defer func() {
-		close(ch)
-		rightConn.Close()
+		//}()
 	}()
 
 	io.Copy(WriteOnlyWriter{Writer: rightConn}, ReadOnlyReader{Reader: leftConn})
 	rightConn.SetReadDeadline(time.Now())
+	//defer func() {
 	rightConn.Close()
 	<-ch
+	//}()
 }
 
 //func relay(leftConn, rightConn net.Conn) {
@@ -139,15 +134,23 @@ func relay(leftConn, rightConn net.Conn) {
 //		buf := pool.Get(pool.RelayBufferSize)
 //		// Wrapping to avoid using *net.TCPConn.(ReadFrom)
 //		// See also https://github.com/finddiff/RuleBaseProxy/pull/1209
+//		defer func() {
+//			pool.Put(buf)
+//			leftConn.Close()
+//		}()
 //		_, err := io.CopyBuffer(N.WriteOnlyWriter{Writer: leftConn}, N.ReadOnlyReader{Reader: rightConn}, buf)
-//		pool.Put(buf)
+//		//pool.Put(buf)
 //		leftConn.SetReadDeadline(time.Now())
 //		ch <- err
 //	}()
 //
 //	buf := pool.Get(pool.RelayBufferSize)
+//	defer func() {
+//		pool.Put(buf)
+//		rightConn.Close()
+//	}()
 //	io.CopyBuffer(N.WriteOnlyWriter{Writer: rightConn}, N.ReadOnlyReader{Reader: leftConn}, buf)
-//	pool.Put(buf)
+//	//pool.Put(buf)
 //	rightConn.SetReadDeadline(time.Now())
 //	<-ch
 //}

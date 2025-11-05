@@ -20,20 +20,20 @@ func ParseProxy(mapping map[string]interface{}) (C.Proxy, error) {
 		err   error
 	)
 	switch proxyType {
-	case "ss":
-		ssOption := &outbound.ShadowSocksOption{}
-		err = decoder.Decode(mapping, ssOption)
-		if err != nil {
-			break
-		}
-		proxy, err = outbound.NewShadowSocks(*ssOption)
-	case "ssr":
-		ssrOption := &outbound.ShadowSocksROption{}
-		err = decoder.Decode(mapping, ssrOption)
-		if err != nil {
-			break
-		}
-		proxy, err = outbound.NewShadowSocksR(*ssrOption)
+	//case "ss":
+	//	ssOption := &outbound.ShadowSocksOption{}
+	//	err = decoder.Decode(mapping, ssOption)
+	//	if err != nil {
+	//		break
+	//	}
+	//	proxy, err = outbound.NewShadowSocks(*ssOption)
+	//case "ssr":
+	//	ssrOption := &outbound.ShadowSocksROption{}
+	//	err = decoder.Decode(mapping, ssrOption)
+	//	if err != nil {
+	//		break
+	//	}
+	//	proxy, err = outbound.NewShadowSocksR(*ssrOption)
 	case "socks5":
 		socksOption := &outbound.Socks5Option{}
 		err = decoder.Decode(mapping, socksOption)
@@ -60,13 +60,13 @@ func ParseProxy(mapping map[string]interface{}) (C.Proxy, error) {
 			break
 		}
 		proxy, err = outbound.NewVmess(*vmessOption)
-	case "snell":
-		snellOption := &outbound.SnellOption{}
-		err = decoder.Decode(mapping, snellOption)
-		if err != nil {
-			break
-		}
-		proxy, err = outbound.NewSnell(*snellOption)
+	//case "snell":
+	//	snellOption := &outbound.SnellOption{}
+	//	err = decoder.Decode(mapping, snellOption)
+	//	if err != nil {
+	//		break
+	//	}
+	//	proxy, err = outbound.NewSnell(*snellOption)
 	case "trojan":
 		trojanOption := &outbound.TrojanOption{}
 		err = decoder.Decode(mapping, trojanOption)

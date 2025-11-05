@@ -226,9 +226,9 @@ func updateGeneral(general *config.General, force bool) {
 		log.Errorln("Start Mixed(http and socks) server error: %s", err.Error())
 	}
 
-	if err := P.ReCreateTun(general.TunDevice, general.TUNPreUp, general.TUNPostUp, tcpIn, udpIn); err != nil {
-		log.Errorln("Start Tun server error: %s", err.Error())
-	}
+	//if err := P.ReCreateTun(general.TunDevice, general.TUNPreUp, general.TUNPostUp, tcpIn, udpIn); err != nil {
+	//	log.Errorln("Start Tun server error: %s", err.Error())
+	//}
 }
 
 func updateUsers(users []auth.AuthUser) {

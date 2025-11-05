@@ -127,6 +127,7 @@ func withMapping(mapping *cache.LruCache) middleware {
 						all_eq = true
 					}
 				}
+				log.Debugln("ResolverEnhancer mapping.SetWithExpire [%s] => [%s]", ip.String(), ctx.Host)
 				mapping.SetWithExpire(ip.String(), ctx.Host, time.Now().Add(time.Second*time.Duration(ttl)))
 
 				if all_eq {
@@ -184,6 +185,75 @@ func withFakeIP(fakePool *fakeip.Pool) middleware {
 	}
 }
 
+func dualQuery(resolver *Resolver, r *D.Msg) (msg *D.Msg, err error) {
+	// 同时查询IPv4和IPv6
+	// 1. 创建AAAA查询消息
+	aaaaMsg := r.Copy()
+	aaaaMsg.Question[0].Qtype = D.TypeAAAA
+
+	// 2. 并发执行两个查询
+	type result struct {
+		msg *D.Msg
+		err error
+	}
+
+	resultCh := make(chan result, 2)
+
+	// 查询A记录（IPv4）
+	go func() {
+		msg, err := resolver.Exchange(r)
+		resultCh <- result{msg: msg, err: err}
+	}()
+
+	// 查询AAAA记录（IPv6）
+	go func() {
+		msg, err := resolver.Exchange(aaaaMsg)
+		resultCh <- result{msg: msg, err: err}
+	}()
+
+	// 3. 收集结果并合并
+	var aResult, aaaaResult result
+	for i := 0; i < 2; i++ {
+		res := <-resultCh
+		if res.msg != nil && len(res.msg.Question) > 0 {
+			if res.msg.Question[0].Qtype == D.TypeA {
+				aResult = res
+			} else {
+				aaaaResult = res
+			}
+		}
+	}
+
+	log.Debugln("[DNS Server] Merged query:%s  aResult:%v ", r.Question[0].String(), aResult.msg)
+	log.Debugln("[DNS Server] Merged query:%s  aaaaResult:%v ", r.Question[0].String(), aaaaResult.msg)
+
+	// 4. 合并结果
+	var finalMsg *D.Msg
+	if aResult.err == nil && aResult.msg != nil && aResult.msg.Rcode == D.RcodeSuccess {
+		finalMsg = aResult.msg
+		// 如果有AAAA结果且有效，合并到最终消息中
+		if aaaaResult.err == nil && aaaaResult.msg != nil && len(aaaaResult.msg.Answer) > 0 {
+			finalMsg.Answer = append(finalMsg.Answer, aaaaResult.msg.Answer...)
+			// 合并其他部分（Authority和Additional记录）
+			finalMsg.Ns = append(finalMsg.Ns, aaaaResult.msg.Ns...)
+			finalMsg.Extra = append(finalMsg.Extra, aaaaResult.msg.Extra...)
+		}
+	} else if aaaaResult.err == nil && aaaaResult.msg != nil && aaaaResult.msg.Rcode == D.RcodeSuccess {
+		// 如果只有AAAA结果有效，使用它
+		finalMsg = aaaaResult.msg
+	} else {
+		// 如果都失败，返回第一个错误
+		finalMsg = aResult.msg
+	}
+
+	finalMsg.SetRcode(r, finalMsg.Rcode)
+	finalMsg.Authoritative = true
+	finalMsg.RecursionAvailable = true
+
+	log.Debugln("[DNS Server] Merged IPv4 and IPv6 results for %s", r.Question[0].String())
+	return finalMsg, nil
+}
+
 func withResolver(resolver *Resolver) handler {
 	return func(ctx *context.DNSContext, r *D.Msg) (*D.Msg, error) {
 		ctx.SetType(context.DNSTypeRaw)
@@ -194,15 +264,26 @@ func withResolver(resolver *Resolver) handler {
 			return handleMsgWithEmptyAnswer(r), nil
 		}
 
+		//if q.Qtype == D.TypeAAAA {
+		//	return handleMsgWithEmptyAnswer(r), nil
+		//}
+
+		// 检查是否需要同时查询IPv4和IPv6
+		needDualQuery := resolver.ipv6 && q.Qtype == D.TypeA
+		if needDualQuery {
+			return dualQuery(resolver, r)
+		}
+
 		msg, err := resolver.Exchange(r)
 		if err != nil {
 			log.Debugln("[DNS Server] Exchange %s failed: %v", q.String(), err)
 			return msg, err
 		}
 
-		log.Debugln("[DNS Server] Exchange %s msg: %s", q.String(), strings.Replace(msg.String(), "\n", "@n@", -1))
+		log.Debugln("[DNS Server] Exchange %s query-type:%s, query-msg: %s,  response-msg: %s", q.String(), D.Type(r.Question[0].Qtype).String(), strings.Replace(r.String(), "\n", "@n@", -1), strings.Replace(msg.String(), "\n", "@n@", -1))
 		msg.SetRcode(r, msg.Rcode)
 		msg.Authoritative = true
+		msg.RecursionAvailable = true
 
 		return msg, nil
 	}
