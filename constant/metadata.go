@@ -42,6 +42,12 @@ type Type int
 
 func (t Type) String() string {
 	switch t {
+	case AtypIPv4:
+		return "IPv4"
+	case AtypDomainName:
+		return "DomainName"
+	case AtypIPv6:
+		return "IPv6"
 	case HTTP:
 		return "HTTP"
 	case HTTPCONNECT:

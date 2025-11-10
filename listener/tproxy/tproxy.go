@@ -3,6 +3,7 @@ package tproxy
 import (
 	"github.com/finddiff/RuleBaseProxy/adapter/inbound"
 	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/log"
 	"github.com/finddiff/RuleBaseProxy/transport/socks5"
 	"net"
 )
@@ -65,6 +66,7 @@ func New(addr string, in chan<- C.ConnContext) (*Listener, error) {
 				if rl.closed {
 					break
 				}
+				log.Errorln("TProxy tcp Failed to accept connection: %s", err)
 				continue
 			}
 			go rl.handleTProxy(c, in)

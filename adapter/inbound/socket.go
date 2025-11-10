@@ -12,9 +12,10 @@ import (
 // NewSocket receive TCP inbound and return ConnContext
 func NewSocket(target socks5.Addr, conn net.Conn, source C.Type) *context.ConnContext {
 	metadata := parseSocksAddr(target)
-	log.Debugln("direct NewSocket infokey:%s", metadata.InfoKey())
 	metadata.NetWork = C.TCP
 	metadata.Type = source
+
+	log.Debugln("direct NewSocket infokey:%s", metadata.InfoKey())
 	if ip, port, err := parseAddr(conn.RemoteAddr().String()); err == nil {
 		metadata.SrcIP = ip
 		metadata.SrcPort = port

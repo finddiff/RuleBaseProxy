@@ -4,6 +4,7 @@ import (
 	"github.com/finddiff/RuleBaseProxy/adapter/inbound"
 	"github.com/finddiff/RuleBaseProxy/common/pool"
 	C "github.com/finddiff/RuleBaseProxy/constant"
+	"github.com/finddiff/RuleBaseProxy/log"
 	"github.com/finddiff/RuleBaseProxy/transport/socks5"
 	"net"
 )
@@ -63,6 +64,7 @@ func NewUDP(addr string, in chan<- *inbound.PacketAdapter) (*UDPListener, error)
 				if rl.closed {
 					break
 				}
+				log.Errorln("TProxy udp Failed to read packet: %s", err)
 				continue
 			}
 

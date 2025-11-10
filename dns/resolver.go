@@ -107,11 +107,20 @@ func (r *Resolver) ExchangeContext(ctx context.Context, m *D.Msg) (msg *D.Msg, e
 	cache, expireTime, hit := r.lruCache.GetWithExpire(q.String())
 	if hit {
 		now := time.Now()
+		if cache == nil {
+			if now.Before(expireTime) {
+				return nil, errors.New("lruCache is nil")
+			}
+			return r.exchangeWithoutCache(ctx, m)
+		}
+
 		msg = cache.(*D.Msg).Copy()
 		if expireTime.Before(now) {
-			setMsgTTL(msg, uint32(1)) // Continue fetch
+			log.Debugln("[DNS] hit lruCache %s but time expire ", q.String())
+			setMsgTTL(msg, uint32(2)) // Continue fetch
 			go r.exchangeWithoutCache(ctx, m)
 		} else {
+			log.Debugln("[DNS] hit lruCache %s", q.String())
 			setMsgTTL(msg, uint32(time.Until(expireTime).Seconds()))
 		}
 		return
@@ -126,6 +135,7 @@ func (r *Resolver) exchangeWithoutCache(ctx context.Context, m *D.Msg) (msg *D.M
 	ret, err, shared := r.group.Do(q.String(), func() (result interface{}, err error) {
 		defer func() {
 			if err != nil {
+				r.lruCache.SetWithExpire(q.String(), nil, time.Now().Add(resolver.DefaultDNSTimeout*2))
 				return
 			}
 

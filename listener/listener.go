@@ -218,6 +218,7 @@ func ReCreateTProxy(port int, tcpIn chan<- C.ConnContext, udpIn chan<- *inbound.
 	defer tproxyMux.Unlock()
 
 	addr := genAddr(bindAddress, port, allowLan)
+	log.Infoln("TProxy addr: %s", addr)
 
 	if tproxyListener != nil {
 		if tproxyListener.RawAddress() == addr {
