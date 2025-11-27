@@ -124,6 +124,17 @@ func (vc *Conn) sendRequest() error {
 
 func (vc *Conn) recvResponse() error {
 	var buf []byte
+
+	//设置读取超时
+	timeout := 5 * time.Second
+	if err := vc.Conn.SetReadDeadline(time.Now().Add(timeout)); err != nil {
+		return err
+	}
+	defer func() {
+		// 读取完成后，移除读取超时
+		_ = vc.Conn.SetReadDeadline(time.Time{})
+	}()
+
 	if !vc.isAead {
 		block, err := aes.NewCipher(vc.respBodyKey[:])
 		if err != nil {
@@ -132,6 +143,7 @@ func (vc *Conn) recvResponse() error {
 
 		stream := cipher.NewCFBDecrypter(block, vc.respBodyIV[:])
 		buf = make([]byte, 4)
+
 		_, err = io.ReadFull(vc.Conn, buf)
 		if err != nil {
 			return err
