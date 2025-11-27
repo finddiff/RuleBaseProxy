@@ -293,7 +293,7 @@ func handleTCPConn(ctx C.ConnContext) {
 		tcpTrack = statistic.NewTCPTracker(nil, statistic.DefaultManager, ctx.Metadata(), nil, nil)
 	}
 	defer tcpTrack.Close()
-	tcpTrack.Chain = []string{"DISP", "ERROR"}
+	tcpTrack.Chain = []string{"DISP", "TRACE"}
 
 	metadata := ctx.Metadata()
 	if !metadata.Valid() {
@@ -302,14 +302,14 @@ func handleTCPConn(ctx C.ConnContext) {
 	}
 	//log.Infoln("handleTCPConn infokey:%s", metadata.InfoKey())
 
-	tcpTrack.Chain = []string{"PREH", "ERROR"}
+	tcpTrack.Chain = []string{"PREH", "TRACE"}
 	if err := preHandleMetadata(metadata); err != nil {
 		log.Debugln("[Metadata PreHandle] error: %s", err)
 		return
 	}
 	//log.Infoln("handleTCPConn after preHandleMetadata infokey:%s", metadata.InfoKey())
 
-	tcpTrack.Chain = []string{"MDNS", "ERROR"}
+	tcpTrack.Chain = []string{"MDNS", "TRACE"}
 	proxy, rule, err := resolveMetadata(ctx, metadata)
 	if err != nil {
 		log.Warnln("[Metadata] parse failed: %s", err.Error())
@@ -319,9 +319,9 @@ func handleTCPConn(ctx C.ConnContext) {
 	if rule != nil {
 		tcpTrack.TrackerInfo().Rule = rule.RuleType().String()
 		tcpTrack.TrackerInfo().RulePayload = rule.Payload()
-		tcpTrack.Chain = []string{rule.RuleType().String(), rule.Payload(), proxy.Name(), "DAIL", "ERROR"}
+		tcpTrack.Chain = []string{rule.RuleType().String(), rule.Payload(), proxy.Name(), "DAIL", "TRACE"}
 	} else {
-		tcpTrack.Chain = []string{proxy.Name(), "DAIL", "ERROR"}
+		tcpTrack.Chain = []string{proxy.Name(), "DAIL", "TRACE"}
 	}
 
 	org_DstIP := metadata.DstIP
