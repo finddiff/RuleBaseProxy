@@ -55,11 +55,13 @@ func (d *Direct) DialContext(ctx context.Context, metadata *C.Metadata) (C.Conn,
 	//	}
 	//}
 
-	if metadata.AddrType != C.AtypDomainName {
-		c, err = dialer.DialContextHost(ctx, "tcp", metadata.DstAddr(), metadata.DstPort)
-	} else {
-		c, err = dialer.DialContextHost(ctx, "tcp", metadata.String(), metadata.DstPort)
-	}
+	//if metadata.AddrType != C.AtypDomainName {
+	//	c, err = dialer.DialContextHost(ctx, "tcp", metadata.DstAddr(), metadata.DstPort)
+	//} else {
+	//	c, err = dialer.DialContextHost(ctx, "tcp", metadata.String(), metadata.DstPort)
+	//}
+
+	c, err = dialer.DialContextHost(ctx, "tcp", metadata.DstAddr(), metadata.DstPort)
 
 	if err != nil {
 		if c != nil {
