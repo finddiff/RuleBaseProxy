@@ -32,34 +32,60 @@ func withHosts(hosts *trie.DomainTrie, ipv6 bool) middleware {
 	return func(next handler) handler {
 		return func(ctx *context.DNSContext, r *D.Msg) (*D.Msg, error) {
 			q := r.Question[0]
+			//log.Debugln("withHosts q:%s", q)
 
+			//log.Debugln("withHosts !isIPRequest: %v", !isIPRequest(q))
 			if !isIPRequest(q) {
 				return next(ctx, r)
 			}
 
 			record := hosts.Search(strings.TrimRight(q.Name, "."))
+			//log.Debugln("withHosts record: %v", record)
 			if record == nil {
 				return next(ctx, r)
 			}
 
-			ip := record.Data.(net.IP)
+			ips := record.Data.([]net.IP)
 			msg := r.Copy()
 
-			if v4 := ip.To4(); v4 != nil && q.Qtype == D.TypeA {
-				rr := &D.A{}
-				rr.Hdr = D.RR_Header{Name: q.Name, Rrtype: D.TypeA, Class: D.ClassINET, Ttl: dnsDefaultTTL}
-				rr.A = v4
-
-				msg.Answer = []D.RR{rr}
-			} else if v6 := ip.To16(); v4 == nil && ipv6 && v6 != nil && q.Qtype == D.TypeAAAA {
-				rr := &D.AAAA{}
-				rr.Hdr = D.RR_Header{Name: q.Name, Rrtype: D.TypeAAAA, Class: D.ClassINET, Ttl: dnsDefaultTTL}
-				rr.AAAA = v6
-
-				msg.Answer = []D.RR{rr}
-			} else {
-				return next(ctx, r)
+			var answer []D.RR
+			for _, ip := range ips {
+				if v4 := ip.To4(); v4 != nil && q.Qtype == D.TypeA {
+					rr := &D.A{}
+					rr.Hdr = D.RR_Header{Name: q.Name, Rrtype: D.TypeA, Class: D.ClassINET, Ttl: dnsDefaultTTL}
+					rr.A = v4
+					answer = append(answer, rr)
+					//msg.Answer = []D.RR{rr}
+				} else if v6 := ip.To16(); v4 == nil && ipv6 && v6 != nil && q.Qtype == D.TypeAAAA {
+					rr := &D.AAAA{}
+					rr.Hdr = D.RR_Header{Name: q.Name, Rrtype: D.TypeAAAA, Class: D.ClassINET, Ttl: dnsDefaultTTL}
+					rr.AAAA = v6
+					answer = append(answer, rr)
+					//msg.Answer = []D.RR{rr}
+				}
 			}
+
+			//if len(answer) == 0 {
+			//	return next(ctx, r)
+			//}
+
+			msg.Answer = answer
+
+			//if v4 := ip.To4(); v4 != nil && q.Qtype == D.TypeA {
+			//	rr := &D.A{}
+			//	rr.Hdr = D.RR_Header{Name: q.Name, Rrtype: D.TypeA, Class: D.ClassINET, Ttl: dnsDefaultTTL}
+			//	rr.A = v4
+			//
+			//	msg.Answer = []D.RR{rr}
+			//} else if v6 := ip.To16(); v4 == nil && ipv6 && v6 != nil && q.Qtype == D.TypeAAAA {
+			//	rr := &D.AAAA{}
+			//	rr.Hdr = D.RR_Header{Name: q.Name, Rrtype: D.TypeAAAA, Class: D.ClassINET, Ttl: dnsDefaultTTL}
+			//	rr.AAAA = v6
+			//
+			//	msg.Answer = []D.RR{rr}
+			//} else {
+			//	return next(ctx, r)
+			//}
 
 			ctx.SetType(context.DNSTypeHost)
 			msg.SetRcode(r, D.RcodeSuccess)
@@ -75,6 +101,7 @@ func withADGurd() middleware {
 	return func(next handler) handler {
 		return func(ctx *context.DNSContext, r *D.Msg) (*D.Msg, error) {
 			//q := r.Question[0]
+			//log.Debugln("withADGurd q:%s", q)
 			//host := strings.TrimRight(q.Name, ".")
 			if ADGurdMatch(ctx.Host) {
 				log.Debugln("%s from %s ADGurdMatch block", ctx.Host, ctx.RemoteAddr().String())
@@ -90,6 +117,7 @@ func withMapping(mapping *cache.LruCache) middleware {
 	return func(next handler) handler {
 		return func(ctx *context.DNSContext, r *D.Msg) (*D.Msg, error) {
 			q := r.Question[0]
+			//log.Debugln("withMapping q:%s", q)
 
 			if !isIPRequest(q) {
 				return next(ctx, r)
@@ -152,6 +180,7 @@ func withFakeIP(fakePool *fakeip.Pool) middleware {
 	return func(next handler) handler {
 		return func(ctx *context.DNSContext, r *D.Msg) (*D.Msg, error) {
 			q := r.Question[0]
+			//log.Debugln("withFakeIP q:%s", q)
 
 			//host := strings.TrimRight(q.Name, ".")
 			if fakePool.LookupHost(ctx.Host) {
@@ -261,6 +290,7 @@ func withResolver(resolver *Resolver) handler {
 	return func(ctx *context.DNSContext, r *D.Msg) (*D.Msg, error) {
 		ctx.SetType(context.DNSTypeRaw)
 		q := r.Question[0]
+		//log.Debugln("withResolver q:%s", q)
 
 		// return a empty AAAA msg when ipv6 disabled
 		if !resolver.ipv6 && q.Qtype == D.TypeAAAA {

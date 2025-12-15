@@ -8,6 +8,7 @@ import (
 	"github.com/finddiff/RuleBaseProxy/log"
 	"net"
 	"strconv"
+	"time"
 )
 
 type ReDirect struct {
@@ -63,6 +64,18 @@ func (r *redirectPacketConn) WriteTo(b []byte, addr net.Addr) (n int, err error)
 
 func (r *redirectPacketConn) ReadFrom(b []byte) (int, net.Addr, error) {
 	log.Debugln("redirectPacketConn ReadFrom:%v", r.sourceUDPAddr)
+
+	// 设置读取超时 udp 端口时间最长60秒
+	timeout := 60 * time.Second
+	if err := r.PacketConn.SetReadDeadline(time.Now().Add(timeout)); err != nil {
+		return 0, nil, err
+	}
+
+	// 读取完成后移除超时设置
+	defer func() {
+		_ = r.PacketConn.SetReadDeadline(time.Time{})
+	}()
+
 	n, _, e := r.PacketConn.ReadFrom(b)
 	if e != nil {
 		return 0, nil, e

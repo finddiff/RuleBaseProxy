@@ -162,7 +162,7 @@ func preHandleMetadata(metadata *C.Metadata) error {
 				// redir-host should lookup the hosts
 				//metadata.DstIP = node.Data.(net.IP)
 				if metadata.DstIP == nil {
-					metadata.DstIP = node.Data.(net.IP)
+					metadata.DstIP = node.Data.([]net.IP)[0]
 					//log.Debugln("preHandleMetadata after resolver.DefaultHosts infokey:%s", metadata.InfoKey())
 				}
 			}
@@ -403,9 +403,9 @@ func match(metadata *C.Metadata) (C.Proxy, C.Rule, error) {
 	var resolved bool
 
 	if node := resolver.DefaultHosts.Search(metadata.Host); node != nil {
-		ip := node.Data.(net.IP)
+		ipList := node.Data.([]net.IP)
 		if metadata.DstIP == nil {
-			metadata.DstIP = ip
+			metadata.DstIP = ipList[0]
 		}
 		resolved = true
 	}

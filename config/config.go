@@ -448,11 +448,25 @@ func parseHosts(cfg *RawConfig) (*trie.DomainTrie, error) {
 
 	if len(cfg.Hosts) != 0 {
 		for domain, ipStr := range cfg.Hosts {
-			ip := net.ParseIP(ipStr)
-			if ip == nil {
-				return nil, fmt.Errorf("%s is not a valid IP", ipStr)
+			var ipList []net.IP
+			if strings.Contains(ipStr, ",") {
+				ips := strings.Split(ipStr, ",")
+				for _, ip := range ips {
+					ip = strings.TrimSpace(ip)
+					if ip == "" {
+						continue
+					}
+					ipList = append(ipList, net.ParseIP(ip))
+				}
+			} else {
+				ip := net.ParseIP(strings.TrimSpace(ipStr))
+				if ip == nil {
+					return nil, fmt.Errorf("%s is not a valid IP", ipStr)
+				}
+				ipList = append(ipList, ip)
 			}
-			tree.Insert(domain, ip)
+
+			tree.Insert(domain, ipList)
 		}
 	}
 
