@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/finddiff/RuleBaseProxy/component/dialer"
 	"github.com/finddiff/RuleBaseProxy/component/resolver"
@@ -101,6 +102,11 @@ func newDoHClient(dohurl string, r *Resolver) *dohClient {
 
 					return dialer.DialContext(ctx, "tcp", net.JoinHostPort(ip.String(), port))
 				},
+				// from http.DefaultTransport
+				MaxIdleConns:          100,
+				IdleConnTimeout:       15 * time.Second,
+				TLSHandshakeTimeout:   5 * time.Second,
+				ExpectContinueTimeout: 1 * time.Second,
 			},
 		}
 	} else {
@@ -121,6 +127,12 @@ func newDoHClient(dohurl string, r *Resolver) *dohClient {
 
 					return dialer.DialContext(ctx, "tcp", net.JoinHostPort(ip.String(), port))
 				},
+
+				// from http.DefaultTransport
+				MaxIdleConns:          100,
+				IdleConnTimeout:       15 * time.Second,
+				TLSHandshakeTimeout:   5 * time.Second,
+				ExpectContinueTimeout: 1 * time.Second,
 			},
 		}
 	}

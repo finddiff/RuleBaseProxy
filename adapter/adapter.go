@@ -3,6 +3,7 @@ package adapter
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -15,10 +16,18 @@ import (
 	"go.uber.org/atomic"
 )
 
+var (
+	ErrRateLimit = errors.New("rate limit exceeded due to continuous failures")
+)
+
 type Proxy struct {
 	C.ProxyAdapter
 	history *queue.Queue
 	alive   *atomic.Bool
+
+	// 新增字段
+	lastSuccessTime *atomic.Uint64 // 存储 UnixNano 格式的时间戳
+	sem             chan struct{}  // 用于限流的信号量（容量为3）
 }
 
 // Alive implements C.Proxy
@@ -35,6 +44,24 @@ func (p *Proxy) Dial(metadata *C.Metadata) (C.Conn, error) {
 
 // DialContext implements C.ProxyAdapter
 func (p *Proxy) DialContext(ctx context.Context, metadata *C.Metadata) (C.Conn, error) {
+	now := time.Now()
+	lastSuccess := time.Unix(0, int64(p.lastSuccessTime.Load()))
+
+	// 规则：如果最近5秒内没有成功记录
+	isFailingStrictly := now.Sub(lastSuccess) > C.DefaultTCPTimeout
+
+	if isFailingStrictly {
+		// 尝试非阻塞地获取令牌
+		select {
+		case p.sem <- struct{}{}:
+			// 拿到令牌，记得释放
+			defer func() { <-p.sem }()
+		default:
+			// 令牌已满，直接返回限流错误
+			return nil, ErrRateLimit
+		}
+	}
+
 	conn, err := p.ProxyAdapter.DialContext(ctx, metadata)
 	if err != nil {
 		p.alive.Store(false)
@@ -148,7 +175,13 @@ func (p *Proxy) URLTest(ctx context.Context, url string) (t uint16, err error) {
 }
 
 func NewProxy(adapter C.ProxyAdapter) *Proxy {
-	return &Proxy{adapter, queue.New(10), atomic.NewBool(true)}
+	return &Proxy{
+		adapter,
+		queue.New(10),
+		atomic.NewBool(true),
+		atomic.NewUint64(uint64(time.Now().UnixNano())),
+		make(chan struct{}, 3), // 初始化信号量，容量为3
+	}
 }
 
 func urlToMetadata(rawURL string) (addr C.Metadata, err error) {

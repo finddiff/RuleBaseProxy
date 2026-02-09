@@ -116,9 +116,10 @@ func (r *Resolver) ExchangeContext(ctx context.Context, m *D.Msg) (msg *D.Msg, e
 
 		msg = cache.(*D.Msg).Copy()
 		if expireTime.Before(now) {
-			log.Debugln("[DNS] hit lruCache %s but time expire ", q.String())
-			setMsgTTL(msg, uint32(2)) // Continue fetch
-			go r.exchangeWithoutCache(ctx, m)
+			//log.Debugln("[DNS] hit lruCache %s but time expire ", q.String())
+			//setMsgTTL(msg, uint32(2)) // Continue fetch
+			//go r.exchangeWithoutCache(ctx, m)
+			return r.exchangeWithoutCache(ctx, m)
 		} else {
 			log.Debugln("[DNS] hit lruCache %s", q.String())
 			setMsgTTL(msg, uint32(time.Until(expireTime).Seconds()))

@@ -1,9 +1,8 @@
 package socks
 
 import (
-	"io"
-	"io/ioutil"
 	"net"
+	"time"
 
 	"github.com/finddiff/RuleBaseProxy/adapter/inbound"
 	N "github.com/finddiff/RuleBaseProxy/common/net"
@@ -91,6 +90,31 @@ func HandleSocks4(conn net.Conn, in chan<- C.ConnContext) {
 	in <- inbound.NewSocket(socks5.ParseAddr(addr), conn, C.SOCKS4)
 }
 
+func waitUDPControlConn(conn net.Conn, idleTimeout time.Duration) {
+	defer conn.Close()
+
+	// 1. 设置读取超时
+	// 如果 idleTimeout 内没有任何数据流进（包括 FIN 包），Read 将返回 timeout 错误
+	if idleTimeout > 0 {
+		_ = conn.SetReadDeadline(time.Now().Add(idleTimeout))
+	}
+
+	// 2. 使用小缓冲区进行读取，减少内存占用
+	// 不需要 io.Copy 那么大的缓冲区（默认 32KB），UDP 控制连接通常没有数据流
+	buf := make([]byte, 128)
+	for {
+		_, err := conn.Read(buf)
+		if err != nil {
+			// 如果是超时、EOF 或连接关闭，则退出循环
+			return
+		}
+		// 如果客户端竟然发了数据（不符合协议预期），可以重置超时时间
+		if idleTimeout > 0 {
+			_ = conn.SetReadDeadline(time.Now().Add(idleTimeout))
+		}
+	}
+}
+
 func HandleSocks5(conn net.Conn, in chan<- C.ConnContext) {
 	target, command, err := socks5.ServerHandshake(conn, authStore.Authenticator())
 	if err != nil {
@@ -99,10 +123,12 @@ func HandleSocks5(conn net.Conn, in chan<- C.ConnContext) {
 	}
 	if c, ok := conn.(*net.TCPConn); ok {
 		c.SetKeepAlive(true)
+		c.SetKeepAlivePeriod(30 * time.Second)
 	}
 	if command == socks5.CmdUDPAssociate {
 		defer conn.Close()
-		io.Copy(ioutil.Discard, conn)
+		waitUDPControlConn(conn, 3*time.Minute)
+		//io.Copy(io.Discard, conn)
 		return
 	}
 	in <- inbound.NewSocket(target, conn, C.SOCKS5)
