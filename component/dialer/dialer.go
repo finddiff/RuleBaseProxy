@@ -3,10 +3,10 @@ package dialer
 import (
 	"context"
 	"errors"
+	"github.com/finddiff/RuleBaseProxy/component/resolver"
+	"github.com/finddiff/RuleBaseProxy/log"
 	"net"
 	"time"
-
-	"github.com/finddiff/RuleBaseProxy/component/resolver"
 )
 
 func DialContext(ctx context.Context, network, address string, options ...Option) (net.Conn, error) {
@@ -70,6 +70,7 @@ func ExDialContext(ctx context.Context, network string, destination net.IP, port
 }
 
 func DialContextHost(ctx context.Context, network string, host string, port string, options ...Option) (net.Conn, error) {
+	log.Debugln("DialContextHost network:%s host:%s port:%s", network, host, port)
 	dialer := &net.Dialer{Timeout: 5 * time.Second}
 	conn, error := dialer.DialContext(ctx, network, net.JoinHostPort(host, port))
 	return conn, error
