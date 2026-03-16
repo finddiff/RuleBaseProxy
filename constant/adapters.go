@@ -36,6 +36,11 @@ const (
 type Connection interface {
 	Chains() Chain
 	AppendToChains(adapter ProxyAdapter)
+	Raddr() *net.UDPAddr
+	SetRaddr(addr *net.UDPAddr)
+	NeedUpdateDeadline(timeout time.Duration) bool
+	UpdateLastUpdate()
+	GetLastUpdate() time.Time
 }
 
 type Chain []string

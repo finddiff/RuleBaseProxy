@@ -10,6 +10,8 @@ type BufferedConn struct {
 	net.Conn
 }
 
+func (c *BufferedConn) RawConn() net.Conn { return c.Conn }
+
 func NewBufferedConn(c net.Conn) *BufferedConn {
 	return &BufferedConn{bufio.NewReader(c), c}
 }

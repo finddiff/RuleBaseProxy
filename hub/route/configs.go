@@ -41,6 +41,8 @@ type configSchema struct {
 	TUNPostUp   []string           `json:"tun-postup"`
 	MemoryLimit *int64             `json:"memoryLimit"`
 	Gogc        *int               `json:"gogc"`
+	MaxConns    *int               `json:"connectLimit"`
+	ZeroCopy    *bool              `json:"zero-copy"`
 }
 
 func getConfigs(w http.ResponseWriter, r *http.Request) {
@@ -104,6 +106,18 @@ func patchConfigs(w http.ResponseWriter, r *http.Request) {
 	if general.Gogc != nil && *general.Gogc >= 10 && *general.Gogc <= 1000 {
 		// NextGC = LiveData * (1 + GOGC / 100) 动态调整 下次GC比例，最小为 10% 最大为 1000%
 		debug.SetGCPercent(*general.Gogc)
+	}
+
+	if general.MaxConns != nil {
+		if *general.MaxConns <= 0 {
+			tunnel.SetMaxConns(5000)
+		} else {
+			tunnel.SetMaxConns(int64(*general.MaxConns))
+		}
+	}
+
+	if general.ZeroCopy != nil {
+		tunnel.SetZeroCopy(*general.ZeroCopy)
 	}
 
 	render.NoContent(w, r)

@@ -2,6 +2,7 @@ package tunnel
 
 import (
 	"fmt"
+	"golang.org/x/sync/singleflight"
 	"net"
 	"runtime"
 	"sync"
@@ -31,6 +32,9 @@ var (
 
 	// default timeout for UDP session
 	udpTimeout = 60 * time.Second
+
+	// singleflight.Group for UDP session
+	udpSF singleflight.Group
 )
 
 func init() {
@@ -210,84 +214,99 @@ func handleUDPConn(packet *inbound.PacketAdapter) {
 
 	key := packet.LocalAddr().String()
 
-	handle := func() bool {
-		pc := natTable.Get(key)
-		if pc != nil {
-			handleUDPToRemote(packet, pc, metadata, key)
-			return true
-		}
-		return false
-	}
-
-	if handle() {
+	// 1. 先尝试直接从 natTable 获取已存在的连接
+	if pc := natTable.Get(key); pc != nil {
+		handleUDPToRemote(packet, pc, metadata, key)
 		return
 	}
 
-	lockKey := key + "-lock"
-	cond, loaded := natTable.GetOrCreateLock(lockKey)
-
+	// 2. 使用 singleflight 确保只有一个协程在 Dial
+	// 这样不需要手动管理 sync.Cond 和 LockKey
 	go func() {
-		if loaded {
-			cond.L.Lock()
-			cond.Wait()
-			handle()
-			cond.L.Unlock()
-			return
-		}
-
-		defer func() {
-			natTable.Delete(lockKey)
-			cond.Broadcast()
-		}()
-
-		ctx := context.NewPacketConnContext(metadata)
-		proxy, rule, err := resolveMetadata(ctx, metadata)
-		if err != nil {
-			log.Warnln("[UDP] Parse metadata failed: %s", err.Error())
-			return
-		}
-
-		pc := statistic.NewUDPTracker(nil, statistic.DefaultManager, metadata, rule, proxy)
-		statistic.DefaultManager.Join(pc)
-		rawPc, err := proxy.DialUDP(metadata)
-		if err != nil {
-			if rule == nil {
-				log.Warnln("[UDP] dial %s to %s error: %s", proxy.Name(), metadata.RemoteAddress(), err.Error())
-			} else {
-				log.Warnln("[UDP] dial %s (match %s/%s) to %s error: %s", proxy.Name(), rule.RuleType().String(), rule.Payload(), metadata.RemoteAddress(), err.Error())
+		_, err, _ := udpSF.Do(key, func() (interface{}, error) {
+			// 双重检查，防止在进入 Do 之前连接已建立
+			if pc := natTable.Get(key); pc != nil {
+				return pc, nil
 			}
-			pc.Chain = []string{err.Error(), "ERROR", proxy.Name()}
-			//time.Sleep(time.Duration(3) * time.Second)
-			pc.Close()
+
+			//if !metadata.Resolved() {
+			//	ip, err := resolver.ResolveIP(metadata.Host)
+			//	if err != nil {
+			//		return nil, err
+			//	}
+			//	if metadata.DstIP == nil {
+			//		metadata.DstIP = ip
+			//	}
+			//}
+			//
+			//addr := metadata.UDPAddr()
+			//if addr == nil {
+			//	return nil, errors.New("udp addr invalid")
+			//}
+
+			// 执行创建连接的逻辑
+			ctx := context.NewPacketConnContext(metadata)
+			proxy, rule, err := resolveMetadata(ctx, metadata)
+			if err != nil {
+				log.Warnln("[UDP] Parse metadata failed: %s", err.Error())
+				return nil, err
+			}
+
+			//拨号前先加入跟踪器，确保在拨号出现问题时，已经在管理器内进行跟踪
+			pc := statistic.NewUDPTracker(nil, statistic.DefaultManager, metadata, rule, proxy)
+			statistic.DefaultManager.Join(pc)
+
+			rawPc, err := proxy.DialUDP(metadata)
+			if err != nil {
+				if rule == nil {
+					log.Warnln("[UDP] dial %s to %s error: %s", proxy.Name(), metadata.RemoteAddress(), err.Error())
+				} else {
+					log.Warnln("[UDP] dial %s (match %s/%s) to %s error: %s", proxy.Name(), rule.RuleType().String(), rule.Payload(), metadata.RemoteAddress(), err.Error())
+				}
+				pc.Chain = []string{err.Error(), "ERROR", proxy.Name()}
+				pc.Close()
+				return nil, err
+			}
+			pc.PacketConn = rawPc
+			pc.Chain = rawPc.Chains()
+			//pc.SetRaddr(addr)
+			ctx.InjectPacketConn(rawPc)
+
+			// 启动读取协程
+			go handleUDPToLocal(packet.UDPPacket, pc, key, fAddr)
+			natTable.Set(key, pc)
+
+			switch true {
+			case rule != nil:
+				log.Infoln("[UDP] %s --> %s match %s(%s) using %s", metadata.SourceAddress(), metadata.RemoteAddress(), rule.RuleType().String(), rule.Payload(), rawPc.Chains().String())
+			case mode == Global:
+				log.Infoln("[UDP] %s --> %s using GLOBAL", metadata.SourceAddress(), metadata.RemoteAddress())
+			case mode == Direct:
+				log.Infoln("[UDP] %s --> %s using DIRECT", metadata.SourceAddress(), metadata.RemoteAddress())
+			default:
+				log.Infoln("[UDP] %s --> %s doesn't match any rule using DIRECT", metadata.SourceAddress(), metadata.RemoteAddress())
+			}
+
+			return pc, nil
+		})
+
+		if err != nil {
+			log.Warnln("[UDP] setup connection failed: %v", err)
 			return
 		}
-		ctx.InjectPacketConn(rawPc)
-		pc.PacketConn = rawPc
-		pc.Chain = rawPc.Chains()
-		//statistic.DefaultManager.Join(pc)
-		//pc := statistic.NewUDPTracker(rawPc, statistic.DefaultManager, metadata, rule)
 
-		switch true {
-		case rule != nil:
-			log.Infoln("[UDP] %s --> %s match %s(%s) using %s", metadata.SourceAddress(), metadata.RemoteAddress(), rule.RuleType().String(), rule.Payload(), rawPc.Chains().String())
-		case mode == Global:
-			log.Infoln("[UDP] %s --> %s using GLOBAL", metadata.SourceAddress(), metadata.RemoteAddress())
-		case mode == Direct:
-			log.Infoln("[UDP] %s --> %s using DIRECT", metadata.SourceAddress(), metadata.RemoteAddress())
-		default:
-			log.Infoln("[UDP] %s --> %s doesn't match any rule using DIRECT", metadata.SourceAddress(), metadata.RemoteAddress())
+		// 3. 成功后，再次调用 handle
+		if pc := natTable.Get(key); pc != nil {
+			handleUDPToRemote(packet, pc, metadata, key)
 		}
-
-		go handleUDPToLocal(packet.UDPPacket, pc, key, fAddr)
-
-		natTable.Set(key, pc)
-		handle()
 	}()
 }
 
 func handleTCPConn(ctx C.ConnContext) {
 	defer ctx.Conn().Close()
 	tcpTrack := statistic.Conn2TCPTracker(ctx.Tracker())
+
+	startTcpConn := time.Since(tcpTrack.Start).Milliseconds()
 
 	if tcpTrack == nil {
 		tcpTrack = statistic.NewTCPTracker(nil, statistic.DefaultManager, ctx.Metadata(), nil, nil)
@@ -348,6 +367,7 @@ func handleTCPConn(ctx C.ConnContext) {
 
 	log.Debugln("proxy(%v).Dial metadata NetWork:%v Type:%v SrcIP:%v DstIP:%v SrcPort:%v DstPort:%v AddrType:%v Host:%v", proxy.Name(), metadata.NetWork, metadata.Type, metadata.SrcIP, metadata.DstIP, metadata.SrcPort, metadata.DstPort, metadata.AddrType, metadata.Host)
 	//tcpTrack.Chain = []string{proxy.Name(), "DAIL", "ERROR"}
+	startDial := time.Since(tcpTrack.Start).Milliseconds()
 	remoteConn, err := proxy.Dial(metadata)
 
 	metadata.AddrType = org_AddrType
@@ -379,13 +399,13 @@ func handleTCPConn(ctx C.ConnContext) {
 
 	switch true {
 	case rule != nil:
-		log.Infoln("[TCP] %s --> %s match %s(%s) using %s", metadata.SourceAddress(), metadata.RemoteAddress(), rule.RuleType().String(), rule.Payload(), remoteConn.Chains().String())
+		log.Infoln("[TCP] %s --> %s match %s(%s) using %s, startTcpConn:%dms, startDial:%dms, cost:%dms", metadata.SourceAddress(), metadata.RemoteAddress(), rule.RuleType().String(), rule.Payload(), remoteConn.Chains().String(), startTcpConn, startDial, time.Since(tcpTrack.Start).Milliseconds())
 	case mode == Global:
-		log.Infoln("[TCP] %s --> %s using GLOBAL", metadata.SourceAddress(), metadata.RemoteAddress())
+		log.Infoln("[TCP] %s --> %s using GLOBAL, startTcpConn:%dms, startDial:%dms, cost:%dms", metadata.SourceAddress(), metadata.RemoteAddress(), startTcpConn, startDial, time.Since(tcpTrack.Start).Milliseconds())
 	case mode == Direct:
-		log.Infoln("[TCP] %s --> %s using DIRECT", metadata.SourceAddress(), metadata.RemoteAddress())
+		log.Infoln("[TCP] %s --> %s using DIRECT, startTcpConn:%dms, startDial:%dms, cost:%dms", metadata.SourceAddress(), metadata.RemoteAddress(), startTcpConn, startDial, time.Since(tcpTrack.Start).Milliseconds())
 	default:
-		log.Infoln("[TCP] %s --> %s doesn't match any rule using DIRECT", metadata.SourceAddress(), metadata.RemoteAddress())
+		log.Infoln("[TCP] %s --> %s doesn't match any rule using DIRECT, startTcpConn:%dms, startDial:%dms, cost:%dms", metadata.SourceAddress(), metadata.RemoteAddress(), startTcpConn, startDial, time.Since(tcpTrack.Start).Milliseconds())
 	}
 
 	//handleSocket(ctx, remoteConn)

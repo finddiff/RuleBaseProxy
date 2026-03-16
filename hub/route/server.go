@@ -73,6 +73,7 @@ func Start(addr string, secret string) {
 
 		r.Mount("/hashmap", hashMapRouter())
 		r.Mount("/dhcp", dhcpRouter())
+		r.Mount("/sensors", sensorRouter())
 	})
 
 	if uiPath != "" {

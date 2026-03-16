@@ -112,6 +112,9 @@ func (m *Manager) handle() {
 		//download := int64(0)
 		m.connections.Range(func(key, value interface{}) bool {
 			tinfo := value.(tracker).TrackerInfo()
+			if tinfo.ModeZeroCopy {
+				return true
+			}
 			//upload = tinfo.UploadTotal.Load()
 			//upload = tinfo.UploadTotal - tinfo.TempUpload
 			allTempUpload += tinfo.UploadTotal - tinfo.TempUpload

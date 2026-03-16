@@ -158,9 +158,12 @@ func (p *Proxy) URLTest(ctx context.Context, url string) (t uint16, err error) {
 			// 这里强制使用我们解析好的 addr，确保它走代理节点
 			return p.DialContext(c, &addr)
 		},
-		DisableKeepAlives: false, // 必须开启以复用隧道
-		MaxIdleConns:      1,
-		IdleConnTimeout:   10 * time.Second,
+		DisableKeepAlives:     false, // 必须开启以复用隧道
+		MaxIdleConns:          10,
+		MaxIdleConnsPerHost:   10,
+		IdleConnTimeout:       30 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second, // 增加 TLS 握手容错
+		ExpectContinueTimeout: 1 * time.Second,
 	}
 	client := http.Client{Transport: transport, Timeout: 5 * time.Second}
 	defer client.CloseIdleConnections()
@@ -188,9 +191,13 @@ func (p *Proxy) URLTest(ctx context.Context, url string) (t uint16, err error) {
 		req.Header.Set("Connection", "Keep-Alive")
 
 		resp, err := client.Do(req)
-		if err != nil || !isReused {
-			log.Debugln("URLTest proxy:%s, Iteration %d failed: %v, isReused: %v", p.Name(), i, err, isReused)
+		if err != nil {
+			log.Debugln("URLTest proxy:%s, Iteration %d failed: %v", p.Name(), i, err)
 			continue
+		}
+
+		if !isReused {
+			log.Debugln("URLTest proxy:%s, Iteration %d, isReused: %v", p.Name(), i, isReused)
 		}
 		// 必须完全读取 Body 才能复用连接
 		io.Copy(io.Discard, resp.Body)

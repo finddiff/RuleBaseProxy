@@ -98,9 +98,12 @@ func GetGeneral() *config.General {
 			AllowLan:       P.AllowLan(),
 			BindAddress:    P.BindAddress(),
 		},
-		Mode:     tunnel.Mode(),
-		LogLevel: log.Level(),
-		IPv6:     !resolver.DisableIPv6,
+		Mode:         tunnel.Mode(),
+		LogLevel:     log.Level(),
+		IPv6:         !resolver.DisableIPv6,
+		MaxConns:     tunnel.GetMaxConns(),
+		CurrentConns: tunnel.GetCurrentConns(),
+		ZeroCopy:     tunnel.GetZeroCopy(),
 	}
 
 	return general
@@ -224,6 +227,12 @@ func updateGeneral(general *config.General, force bool) {
 
 	if err := P.ReCreateMixed(general.MixedPort, tcpIn, udpIn); err != nil {
 		log.Errorln("Start Mixed(http and socks) server error: %s", err.Error())
+	}
+
+	if general.MaxConns == 0 {
+		tunnel.SetMaxConns(5000)
+	} else {
+		tunnel.SetMaxConns(general.MaxConns)
 	}
 
 	//if err := P.ReCreateTun(general.TunDevice, general.TUNPreUp, general.TUNPostUp, tcpIn, udpIn); err != nil {

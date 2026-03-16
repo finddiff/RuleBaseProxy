@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/finddiff/RuleBaseProxy/log"
 	"net"
 	"time"
 
@@ -58,6 +59,15 @@ func NewWithAuthenticate(addr string, in chan<- C.ConnContext, authenticate bool
 				}
 				continue
 			}
+
+			if tcpConn, ok := conn.(*net.TCPConn); ok {
+				// 1. 禁用 Nagle 算法，消除 40ms 延迟等待
+				log.Debugln("HandleConn set NoDelay=true")
+				tcpConn.SetNoDelay(true)
+			} else {
+				log.Debugln("HandleConn set NoDelay=false")
+			}
+
 			go HandleConn(conn, in, c)
 		}
 	}()

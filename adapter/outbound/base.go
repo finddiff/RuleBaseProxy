@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net"
+	"time"
 
 	C "github.com/finddiff/RuleBaseProxy/constant"
 )
@@ -63,7 +64,18 @@ func NewBase(name string, addr string, tp C.AdapterType, udp bool) *Base {
 
 type conn struct {
 	net.Conn
-	chain C.Chain
+	chain      C.Chain
+	raddr      *net.UDPAddr
+	lastUpdate time.Time
+	canRaw     bool
+}
+
+func (c *conn) RawConn() net.Conn {
+	if c.canRaw {
+		return c.Conn
+	} else {
+		return nil
+	}
 }
 
 // Chains implements C.Connection
@@ -76,13 +88,48 @@ func (c *conn) AppendToChains(a C.ProxyAdapter) {
 	c.chain = append(c.chain, a.Name())
 }
 
+// RUDPAddr implements C.Connection
+func (c *conn) Raddr() *net.UDPAddr {
+	return c.raddr
+}
+
+func (c *conn) SetRaddr(addr *net.UDPAddr) {
+	c.raddr = addr
+}
+
+func (pc *conn) NeedUpdateDeadline(timeout time.Duration) bool {
+	// 允许极小概率的并发读写冲突，在高频 UDP 下完全可以接受
+	return time.Since(pc.lastUpdate) > (timeout / 3)
+}
+
+func (pc *conn) UpdateLastUpdate() {
+	pc.lastUpdate = time.Now()
+}
+
+func (pc *conn) GetLastUpdate() time.Time {
+	return pc.lastUpdate
+}
+
 func NewConn(c net.Conn, a C.ProxyAdapter) C.Conn {
-	return &conn{c, []string{a.Name()}}
+	//canRaw := false
+	//switch a.Type() {
+	//case C.Direct:
+	//	canRaw = true
+	//case C.Http:
+	//	canRaw = true
+	//case C.Socks5:
+	//	canRaw = true // Socks5 可以直接使用 RawConn
+	//default:
+	//	canRaw = false
+	//}
+	return &conn{c, []string{a.Name()}, nil, time.Now(), true}
 }
 
 type packetConn struct {
 	net.PacketConn
-	chain C.Chain
+	chain      C.Chain
+	raddr      *net.UDPAddr
+	lastUpdate time.Time
 }
 
 // Chains implements C.Connection
@@ -95,6 +142,27 @@ func (c *packetConn) AppendToChains(a C.ProxyAdapter) {
 	c.chain = append(c.chain, a.Name())
 }
 
+func (c *packetConn) Raddr() *net.UDPAddr {
+	return c.raddr
+}
+
+func (c *packetConn) SetRaddr(addr *net.UDPAddr) {
+	c.raddr = addr
+}
+
+func (pc *packetConn) NeedUpdateDeadline(timeout time.Duration) bool {
+	// 允许极小概率的并发读写冲突，在高频 UDP 下完全可以接受
+	return time.Since(pc.lastUpdate) > (timeout / 3)
+}
+
+func (pc *packetConn) UpdateLastUpdate() {
+	pc.lastUpdate = time.Now()
+}
+
+func (pc *packetConn) GetLastUpdate() time.Time {
+	return pc.lastUpdate
+}
+
 func newPacketConn(pc net.PacketConn, a C.ProxyAdapter) C.PacketConn {
-	return &packetConn{pc, []string{a.Name()}}
+	return &packetConn{pc, []string{a.Name()}, nil, time.Now()}
 }

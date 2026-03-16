@@ -1,6 +1,7 @@
 package redir
 
 import (
+	"github.com/finddiff/RuleBaseProxy/log"
 	"net"
 
 	"github.com/finddiff/RuleBaseProxy/adapter/inbound"
@@ -47,6 +48,13 @@ func New(addr string, in chan<- C.ConnContext) (*Listener, error) {
 					break
 				}
 				continue
+			}
+			if tcpConn, ok := c.(*net.TCPConn); ok {
+				// 1. 禁用 Nagle 算法，消除 40ms 延迟等待
+				log.Debugln("handleRedir set NoDelay=true")
+				tcpConn.SetNoDelay(true)
+			} else {
+				log.Debugln("handleRedir set NoDelay=false")
 			}
 			go handleRedir(c, in)
 		}

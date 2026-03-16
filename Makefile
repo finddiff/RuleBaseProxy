@@ -35,7 +35,7 @@ WINDOWS_ARCH_LIST = \
 	windows-arm64 \
 	windows-arm32v7
 
-all: windows-amd64 linux-amd64 linux-armv8# Most used
+all: linux-amd64 windows-amd64 linux-armv8# Most used
 
 docker:
 	$(GOBUILD) -o $(BINDIR)/$(NAME)-$@

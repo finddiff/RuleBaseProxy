@@ -44,11 +44,12 @@ type trackerInfo struct {
 	TempDownload  int64
 	//UploadTotal   *atomic.Int64 `json:"upload"`
 	//DownloadTotal *atomic.Int64 `json:"download"`
-	Start       time.Time `json:"start"`
-	Chain       C.Chain   `json:"chains"`
-	Rule        string    `json:"rule"`
-	RulePayload string    `json:"rulePayload"`
-	MarkGC      bool      `json:"markGC"`
+	Start        time.Time `json:"start"`
+	Chain        C.Chain   `json:"chains"`
+	Rule         string    `json:"rule"`
+	RulePayload  string    `json:"rulePayload"`
+	MarkGC       bool      `json:"markGC"`
+	ModeZeroCopy bool      `json:"modeZeroCopy"`
 }
 
 type tcpTracker struct {
@@ -58,12 +59,30 @@ type tcpTracker struct {
 	firstClose bool
 }
 
+func (tt *tcpTracker) RawConn() net.Conn {
+	return tt.Conn
+}
+
 func (tt *tcpTracker) ID() string {
 	return tt.UUID.String()
 }
 
 func (tt *tcpTracker) TrackerInfo() *trackerInfo {
 	return tt.trackerInfo
+}
+
+func (tt *tcpTracker) SetDownloadTotal(download int64) {
+	tt.DownloadTotal += download
+	tt.manager.downloadTotal += download
+}
+
+func (tt *tcpTracker) SetUploadTotal(upload int64) {
+	tt.UploadTotal += upload
+	tt.manager.uploadTotal += upload
+}
+
+func (tt *tcpTracker) SetModeZeroCopy(modeZeroCopy bool) {
+	tt.ModeZeroCopy = modeZeroCopy
 }
 
 func (tt *tcpTracker) Read(b []byte) (int, error) {
@@ -139,6 +158,7 @@ func NewTCPTracker(conn C.Conn, manager *Manager, metadata *C.Metadata, rule C.R
 			DownloadTotal: 0,
 			TempDownload:  0,
 			MarkGC:        false,
+			ModeZeroCopy:  false,
 		},
 		firstClose: true,
 	}

@@ -29,10 +29,13 @@ import (
 type General struct {
 	Inbound
 	Controller
-	Mode      T.TunnelMode `json:"mode"`
-	LogLevel  log.LogLevel `json:"log-level"`
-	IPv6      bool         `json:"ipv6"`
-	Interface string       `json:"-"`
+	Mode         T.TunnelMode `json:"mode"`
+	LogLevel     log.LogLevel `json:"log-level"`
+	IPv6         bool         `json:"ipv6"`
+	Interface    string       `json:"-"`
+	MaxConns     int64        `json:"max-conns"`
+	CurrentConns int64        `json:"current-conns"`
+	ZeroCopy     bool         `json:"zero-copy"`
 }
 
 // Inbound

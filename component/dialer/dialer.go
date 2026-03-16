@@ -71,7 +71,14 @@ func ExDialContext(ctx context.Context, network string, destination net.IP, port
 
 func DialContextHost(ctx context.Context, network string, host string, port string, options ...Option) (net.Conn, error) {
 	log.Debugln("DialContextHost network:%s host:%s port:%s", network, host, port)
-	dialer := &net.Dialer{Timeout: 5 * time.Second}
+	dialer := &net.Dialer{
+		//Control: func(network, address string, c syscall.RawConn) error {
+		//	return c.Control(func(fd uintptr) {
+		//		// 这里调用的函数会根据编译平台自动切换
+		//		_ = enableTFO(fd)
+		//	})
+		//},
+		Timeout: 5 * time.Second}
 	conn, error := dialer.DialContext(ctx, network, net.JoinHostPort(host, port))
 	return conn, error
 }
@@ -116,6 +123,20 @@ func dialContext(ctx context.Context, network string, destination net.IP, port s
 	//}
 	//log.Debugln("dialContext modify timeout=%v", timeout)
 	//statistic.ManagerTimeout.SetWithTTL(timeoutkey, timeout, 1, time.Minute*60*24)
+	// --- 核心修复：建立连接后强制设置 ---
+	if tcpConn, ok := conn.(*net.TCPConn); ok {
+		log.Debugln("dialContext set NoDelay=true")
+		tcpConn.SetNoDelay(true)
+		// 验证设置是否真的成功写入内核
+		//if raw, err := tcpConn.SyscallConn(); err == nil {
+		//	raw.Control(func(fd uintptr) {
+		//		val, err := kernelCheck(fd)
+		//		log.Debugln("Final Kernel Check: FD=%d, NoDelay TCP_NODELAY=%d, Error=%v", fd, val, err)
+		//	})
+		//}
+	} else {
+		log.Debugln("dialContext set NoDelay=false connection (Type: %T)", conn)
+	}
 	return conn, error
 }
 
